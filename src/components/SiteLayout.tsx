@@ -12,6 +12,7 @@ import {
   Linkedin,
   Youtube
 } from 'lucide-react';
+import { withBase } from '../utils/paths';
 
 interface SiteLayoutProps {
   children: React.ReactNode;
@@ -122,9 +123,9 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
       {/* Top Logo Section (scrolls away) */}
       <div className="w-full bg-white">
         <div className="w-full max-w-[1000px] mx-auto flex items-center justify-center py-4 px-4">
-          <a href="/" aria-label="Ir al inicio de Fundación ULEP">
+          <a href={withBase('/')} aria-label="Ir al inicio de Fundación ULEP">
             <img
-              src="/assets/aistudio/FUN_AZUL_8fb1ebfe"
+              src={withBase('/assets/aistudio/FUN_AZUL_8fb1ebfe')}
               alt="Fundación ULEP Logo"
               className="h-14 md:h-16 lg:h-20 object-contain mx-auto"
             />
@@ -153,7 +154,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
               {menuItems.map((item, index) => (
                 <li key={index} className="relative group py-1">
                   <a
-                    href={item.href ?? '#'}
+                    href={item.href ? withBase(item.href) : '#'}
                     onClick={item.href ? undefined : (e) => e.preventDefault()}
                     className="flex items-center gap-1 px-3 py-2 text-sm lg:text-base font-semibold text-blue-900 hover:text-blue-600 transition-colors rounded-md hover:bg-blue-50"
                   >
@@ -167,7 +168,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
                       {item.subitems.map((sub, subIdx) => (
                         <a
                           key={subIdx}
-                          href={sub.href ?? '#'}
+                          href={sub.href ? withBase(sub.href) : '#'}
                           onClick={(e) => handleSubitemClick(e, sub)}
                           className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-600 hover:text-white transition-colors"
                         >
@@ -194,7 +195,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
                   >
                     {item.href ? (
                       <a
-                        href={item.href}
+                        href={withBase(item.href)}
                         onClick={(e) => e.stopPropagation()}
                         className="hover:text-blue-600 transition-colors"
                       >
@@ -214,7 +215,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
                       {item.subitems.map((sub, subIdx) => (
                         <li key={subIdx}>
                           <a
-                            href={sub.href ?? '#'}
+                            href={sub.href ? withBase(sub.href) : '#'}
                             onClick={(e) => handleSubitemClick(e, sub)}
                             className="block py-1.5 text-xs text-gray-600 hover:text-blue-600"
                           >
@@ -241,12 +242,12 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
             {/* Brand Column */}
             <div className="space-y-5">
               <a
-                href="/"
+                href={withBase('/')}
                 className="inline-flex items-center bg-white px-4 py-2.5 rounded-xl shadow-sm"
                 aria-label="Inicio Fundación ULEP"
               >
                 <img
-                  src="/assets/aistudio/FUN_AZUL_8fb1ebfe"
+                  src={withBase('/assets/aistudio/FUN_AZUL_8fb1ebfe')}
                   alt="Fundación ULEP Logo"
                   className="h-10 object-contain"
                 />
@@ -289,7 +290,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
                 ].map((link) => (
                   <li key={link.label}>
                     <a
-                      href={link.href}
+                      href={withBase(link.href)}
                       className="text-blue-200/90 hover:text-white hover:underline underline-offset-4 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded"
                     >
                       {link.label}
@@ -314,7 +315,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
                 ].map((service) => (
                   <li key={service.label}>
                     <a
-                      href={service.href ?? '#'}
+                      href={service.href ? withBase(service.href) : '#'}
                       onClick={service.href ? undefined : (e) => e.preventDefault()}
                       className="text-blue-200/90 hover:text-white hover:underline underline-offset-4 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded"
                     >
@@ -361,14 +362,14 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
             <p>© {new Date().getFullYear()} Fundación ULEP. Todos los derechos reservados.</p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a
-                href="/politica-privacidad.html"
+                href={withBase('/politica-privacidad.html')}
                 className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded"
               >
                 Política de Privacidad y Tratamiento de Datos Personales
               </a>
               <span aria-hidden="true">·</span>
               <a
-                href="/terminos-de-uso.html"
+                href={withBase('/terminos-de-uso.html')}
                 className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded"
               >
                 Términos de Uso

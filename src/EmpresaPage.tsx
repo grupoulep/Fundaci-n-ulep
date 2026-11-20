@@ -11,6 +11,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import SiteLayout from './components/SiteLayout';
+import { withBase } from './utils/paths';
 
 const requestTypes = [
   'Convenio Marco de Cooperación',
@@ -206,7 +207,7 @@ export default function EmpresaPage() {
         {/* Welcome Hero for Companies */}
         <section className="relative overflow-hidden w-full bg-white border-b border-gray-200">
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 h-[118%] w-auto max-w-none object-contain -scale-x-100 opacity-[0.20] mix-blend-multiply"
@@ -289,13 +290,13 @@ export default function EmpresaPage() {
           className="scroll-mt-24 relative overflow-hidden w-full bg-white border-y border-gray-200 py-16"
         >
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden md:block absolute left-0 top-1/2 -translate-y-1/2 h-[95%] w-auto max-w-none object-contain opacity-[0.15] mix-blend-multiply"
           />
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden lg:block absolute right-0 bottom-0 h-[75%] w-auto max-w-none object-contain -scale-x-100 opacity-[0.12] mix-blend-multiply"
@@ -391,13 +392,13 @@ export default function EmpresaPage() {
             {/* Persuasive Callout Banner */}
             <div className="relative overflow-hidden bg-blue-950 text-white rounded-2xl p-8 sm:p-10 mb-10 text-center">
               <img
-                src="/assets/aistudio/PROYECTO_8decce25.png"
+                src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
                 alt=""
                 aria-hidden="true"
                 className="pointer-events-none select-none absolute left-0 top-1/2 -translate-y-1/2 h-[140%] w-auto max-w-none object-contain grayscale invert mix-blend-screen opacity-[0.22]"
               />
               <img
-                src="/assets/aistudio/PROYECTO_8decce25.png"
+                src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
                 alt=""
                 aria-hidden="true"
                 className="pointer-events-none select-none hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 h-[140%] w-auto max-w-none object-contain -scale-x-100 grayscale invert mix-blend-screen opacity-[0.22]"
@@ -658,7 +659,7 @@ export default function EmpresaPage() {
                     <span>
                       Autorizo el tratamiento de los datos suministrados conforme a la{' '}
                       <a
-                        href="/politica-privacidad.html"
+                        href={withBase('/politica-privacidad.html')}
                         className="text-blue-800 hover:underline underline-offset-2 font-medium"
                       >
                         Política de Privacidad y Tratamiento de Datos Personales

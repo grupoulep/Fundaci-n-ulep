@@ -9,6 +9,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import SiteLayout from './components/SiteLayout';
+import { withBase } from './utils/paths';
 
 interface CourseItem {
   id: string;
@@ -29,25 +30,25 @@ const INITIAL_COURSES: CourseItem[] = [
     id: 'gestion-administrativa',
     name: 'Gestión Administrativa y Contable',
     category: 'Administrativos',
-    image: '/src/assets/images/curso_gestion_admin_1795120880122.jpg'
+    image: withBase('/src/assets/images/curso_gestion_admin_1795120880122.jpg')
   },
   {
     id: 'herramientas-digitales',
     name: 'Herramientas Digitales y Excel Aplicado',
     category: 'Tecnología',
-    image: '/src/assets/images/curso_herramientas_dig_1795120878056.jpg'
+    image: withBase('/src/assets/images/curso_herramientas_dig_1795120878056.jpg')
   },
   {
     id: 'atencion-cliente',
     name: 'Atención al Cliente y Ventas',
     category: 'Estudiantiles',
-    image: '/src/assets/images/curso_servicio_cliente_1795120985744.jpg'
+    image: withBase('/src/assets/images/curso_servicio_cliente_1795120985744.jpg')
   },
   {
     id: 'emprendimiento-empresarial',
     name: 'Emprendimiento y Gestión Empresarial',
     category: 'Emprendimiento',
-    image: '/src/assets/images/curso_emprendimiento_1795120881153.jpg'
+    image: withBase('/src/assets/images/curso_emprendimiento_1795120881153.jpg')
   }
 ];
 
@@ -144,7 +145,7 @@ export default function EstudiantesPage() {
           className="relative overflow-hidden w-full bg-white py-16 sm:py-24"
         >
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 h-[108%] w-auto max-w-none object-contain -scale-x-100 opacity-[0.17] mix-blend-multiply"
@@ -162,7 +163,7 @@ export default function EstudiantesPage() {
                 </div>
               ) : (
                 <img
-                  src="/src/assets/images/campus_virtual_ulep_1795120305237.jpg"
+                  src={withBase('/src/assets/images/campus_virtual_ulep_1795120305237.jpg')}
                   alt="Ilustración institucional del Campus Virtual de Fundación ULEP"
                   referrerPolicy="no-referrer"
                   onError={() => setImageError(true)}
@@ -200,7 +201,7 @@ export default function EstudiantesPage() {
           className="scroll-mt-24 relative overflow-hidden w-full bg-gray-50 border-t border-gray-200 py-16 sm:py-20"
         >
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden md:block absolute left-0 top-0 h-[540px] w-auto max-w-none object-contain opacity-[0.14] mix-blend-multiply"

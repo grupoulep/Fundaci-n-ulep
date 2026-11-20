@@ -1,5 +1,6 @@
 import React from 'react';
 import SiteLayout from './components/SiteLayout';
+import { withBase } from './utils/paths';
 
 export default function TermsOfUsePage() {
   return (
@@ -98,7 +99,7 @@ export default function TermsOfUsePage() {
               <p>
                 El tratamiento de los datos personales que el usuario suministre a través de este sitio web se rige por nuestra Política de Privacidad y Tratamiento de Datos Personales, disponible en{' '}
                 <a
-                  href="/politica-privacidad.html"
+                  href={withBase('/politica-privacidad.html')}
                   className="text-blue-700 hover:text-blue-900 underline underline-offset-2"
                 >
                   https://fundacionulep.fun/politica-privacidad

@@ -1,19 +1,20 @@
 import React from 'react';
 import { CreditCard, FileText, HeartHandshake } from 'lucide-react';
 import SiteLayout from './components/SiteLayout';
+import { withBase } from './utils/paths';
 
 export default function TramitesPage() {
   return (
     <SiteLayout>
       <main className="relative overflow-hidden w-full flex-1 bg-white">
         <img
-          src="/assets/aistudio/PROYECTO_8decce25.png"
+          src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
           alt=""
           aria-hidden="true"
           className="pointer-events-none select-none absolute left-0 top-1/2 -translate-y-1/2 h-[125%] w-auto max-w-none object-contain opacity-[0.18] mix-blend-multiply"
         />
         <img
-          src="/assets/aistudio/PROYECTO_8decce25.png"
+          src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
           alt=""
           aria-hidden="true"
           className="pointer-events-none select-none hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 h-[125%] w-auto max-w-none object-contain -scale-x-100 opacity-[0.18] mix-blend-multiply"
@@ -37,7 +38,7 @@ export default function TramitesPage() {
             </div>
           </a>
           <a
-            href="/pqrs.html"
+            href={withBase('/pqrs.html')}
             className="group w-full h-[96px] bg-gray-50 hover:bg-gray-100 border-2 border-blue-400 py-2.5 px-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98]"
             style={{ height: '96px' }}
           >

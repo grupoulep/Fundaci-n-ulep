@@ -11,6 +11,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import SiteLayout from './components/SiteLayout';
+import { withBase } from './utils/paths';
 
 const pqrsTypes = [
   'Petición',
@@ -141,7 +142,7 @@ const faqCategories: FaqCategory[] = [
             y en nuestros canales oficiales. Para participar, solo debes diligenciar el formulario
             de inscripción correspondiente en la sección de{' '}
             <a
-              href="/estudiantes.html#cursos"
+              href={withBase('/estudiantes.html#cursos')}
               className="text-blue-700 font-medium hover:underline underline-offset-2"
             >
               Cursos
@@ -247,7 +248,7 @@ const faqCategories: FaqCategory[] = [
             talento o mediante voluntariado corporativo. Para proponer una alianza, pueden acceder
             al{' '}
             <a
-              href="/empresa.html"
+              href={withBase('/empresa.html')}
               className="text-blue-700 font-medium hover:underline underline-offset-2"
             >
               Panel de Empresas
@@ -317,7 +318,7 @@ const faqCategories: FaqCategory[] = [
             </a>{' '}
             o consultar nuestra{' '}
             <a
-              href="/politica-privacidad.html"
+              href={withBase('/politica-privacidad.html')}
               className="text-blue-700 font-medium hover:underline underline-offset-2"
             >
               Política de Privacidad
@@ -467,7 +468,7 @@ export default function PqrsPage() {
         {/* Institutional Hero Header */}
         <section className="relative overflow-hidden w-full bg-white border-b border-gray-200">
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 h-[125%] w-auto max-w-none object-contain -scale-x-100 opacity-[0.18] mix-blend-multiply"
@@ -750,7 +751,7 @@ export default function PqrsPage() {
                       Autorizo el tratamiento de mis datos personales conforme a la Ley 1581 de
                       2012 y la{' '}
                       <a
-                        href="/politica-privacidad.html"
+                        href={withBase('/politica-privacidad.html')}
                         className="text-blue-800 hover:underline underline-offset-2 font-medium"
                       >
                         Política de Privacidad y Tratamiento de Datos Personales
@@ -869,13 +870,13 @@ export default function PqrsPage() {
           className="scroll-mt-24 relative overflow-hidden w-full bg-white border-t border-gray-200 py-16 sm:py-20"
         >
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden md:block absolute left-0 top-12 h-[540px] w-auto max-w-none object-contain opacity-[0.14] mix-blend-multiply"
           />
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden md:block absolute right-0 bottom-12 h-[540px] w-auto max-w-none object-contain -scale-x-100 opacity-[0.14] mix-blend-multiply"

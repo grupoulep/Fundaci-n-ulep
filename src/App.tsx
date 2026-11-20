@@ -6,16 +6,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import SiteLayout from './components/SiteLayout';
+import { withBase } from './utils/paths';
 
 export default function App() {
   const carouselImages = [
     {
-      url: '/assets/aistudio/1_e7975bbe.png',
+      url: withBase('/assets/aistudio/1_e7975bbe.png'),
       title: 'Fundación ULEP',
       subtitle: 'Educación y compromiso con la comunidad'
     },
     {
-      url: '/assets/aistudio/2_07cc1b38.png',
+      url: withBase('/assets/aistudio/2_07cc1b38.png'),
       title: 'Realiza y consulta tus pagos aquí',
       subtitle: 'Paga tus facturas ULEP y descarga tus certificados'
     }
@@ -23,12 +24,12 @@ export default function App() {
 
   const eventsData = [
     {
-      image: '/assets/aistudio/1_34f12066.png',
+      image: withBase('/assets/aistudio/1_34f12066.png'),
       date: '19 Nov 2026',
       title: 'Proyecto Smart Cole 1.0 - Fundación ULEP'
     },
     {
-      image: '/assets/aistudio/2_f5d2c5c7.png',
+      image: withBase('/assets/aistudio/2_f5d2c5c7.png'),
       date: '19 Nov 2026',
       title: 'Certificado de Voluntariado - Fundación ULEP'
     }
@@ -173,13 +174,13 @@ export default function App() {
           className="relative overflow-hidden w-full bg-white border-y border-gray-200 py-14 sm:py-16 mt-12 mb-16"
         >
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none absolute left-0 top-1/2 -translate-y-1/2 h-[135%] w-auto max-w-none object-contain opacity-[0.18] mix-blend-multiply"
           />
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 h-[135%] w-auto max-w-none object-contain -scale-x-100 opacity-[0.15] mix-blend-multiply"
@@ -217,13 +218,13 @@ export default function App() {
           className="scroll-mt-24 relative overflow-hidden w-full mt-16 mb-24 py-4"
         >
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden md:block absolute left-0 top-8 h-[520px] w-auto max-w-none object-contain opacity-[0.14] mix-blend-multiply"
           />
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden md:block absolute right-0 bottom-4 h-[520px] w-auto max-w-none object-contain -scale-x-100 opacity-[0.14] mix-blend-multiply"
@@ -359,7 +360,7 @@ export default function App() {
           className="relative overflow-hidden w-full bg-white border-t border-gray-200 py-16 sm:py-24"
         >
           <img
-            src="/assets/aistudio/PROYECTO_8decce25.png"
+            src={withBase('/assets/aistudio/PROYECTO_8decce25.png')}
             alt=""
             aria-hidden="true"
             className="pointer-events-none select-none hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 h-[105%] w-auto max-w-none object-contain -scale-x-100 opacity-[0.16] mix-blend-multiply"
@@ -377,7 +378,7 @@ export default function App() {
                 </div>
               ) : (
                 <img
-                  src="/src/assets/images/mapa_colombia_ulep_1795117682970.jpg"
+                  src={withBase('/src/assets/images/mapa_colombia_ulep_1795117682970.jpg')}
                   alt="Mapa de Colombia representando el alcance educativo nacional de Fundación ULEP"
                   referrerPolicy="no-referrer"
                   onError={() => setMapImageError(true)}

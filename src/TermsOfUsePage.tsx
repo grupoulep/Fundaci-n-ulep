@@ -1,8 +1,10 @@
 import React from 'react';
 import SiteLayout from './components/SiteLayout';
 import { withBase } from './utils/paths';
+import { getOrgData } from './utils/vault';
 
 export default function TermsOfUsePage() {
+  const org = getOrgData();
   return (
     <SiteLayout>
       <main className="w-full flex-1 bg-white">
@@ -30,13 +32,14 @@ export default function TermsOfUsePage() {
               <p>
                 El acceso, navegación y uso del sitio web{' '}
                 <a
-                  href="https://fundacionulep.fun"
+                  href={org.websiteUrl}
                   className="text-blue-700 hover:text-blue-900 underline underline-offset-2"
                 >
-                  https://fundacionulep.fun
+                  {org.websiteUrl}
                 </a>
                 , propiedad de FUNDACIÓN ULEP, Entidad Sin Ánimo de Lucro identificada con NIT{' '}
-                <span className="tabular-nums">902.050.377-7</span> y domiciliada en la Carrera 54 # 3A - 19, Barrio Lomas de Granada, Popayán, Cauca, Colombia, implican la aceptación plena y sin reservas de los presentes Términos y Condiciones. Si el usuario no está de acuerdo con ellos, deberá abstenerse de utilizar este portal.
+                <span className="tabular-nums">{org.nit}</span> y domiciliada en la{' '}
+                {org.addressFull}, implican la aceptación plena y sin reservas de los presentes Términos y Condiciones. Si el usuario no está de acuerdo con ellos, deberá abstenerse de utilizar este portal.
               </p>
             </section>
 
@@ -102,7 +105,7 @@ export default function TermsOfUsePage() {
                   href={withBase('/politica-privacidad.html')}
                   className="text-blue-700 hover:text-blue-900 underline underline-offset-2"
                 >
-                  https://fundacionulep.fun/politica-privacidad
+                  {org.privacyUrlText}
                 </a>
                 .
               </p>
@@ -136,12 +139,12 @@ export default function TermsOfUsePage() {
               <p>
                 Estos términos se rigen por las leyes de la República de Colombia y cualquier controversia relacionada con su interpretación o cumplimiento será sometida a la jurisdicción competente en la ciudad de Popayán, Cauca. Para inquietudes sobre el uso de este sitio web, puede comunicarse al correo electrónico{' '}
                 <a
-                  href="mailto:contacto@fundacionulep.fun"
+                  href={`mailto:${org.emailContact}`}
                   className="text-blue-700 hover:text-blue-900 underline underline-offset-2"
                 >
-                  contacto@fundacionulep.fun
+                  {org.emailContact}
                 </a>{' '}
-                o a los teléfonos <span className="tabular-nums">304 410 4926 / 301 451 8052</span>.
+                o a los teléfonos <span className="tabular-nums">{org.phonesSlash}</span>.
               </p>
             </section>
           </div>

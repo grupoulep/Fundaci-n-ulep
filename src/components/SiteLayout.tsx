@@ -13,6 +13,7 @@ import {
   Youtube
 } from 'lucide-react';
 import { withBase } from '../utils/paths';
+import { getOrgData } from '../utils/vault';
 
 interface SiteLayoutProps {
   children: React.ReactNode;
@@ -101,6 +102,7 @@ const menuItems: MenuItem[] = [
 export default function SiteLayout({ children }: SiteLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openSubmenuIndex, setOpenSubmenuIndex] = useState<number | null>(null);
+  const org = getOrgData();
 
   const handleSubitemClick = (e: React.MouseEvent<HTMLAnchorElement>, sub: SubItem) => {
     if (sub.targetId) {
@@ -334,24 +336,24 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
               <ul className="space-y-3.5 text-sm text-blue-200/90">
                 <li className="flex items-start gap-3">
                   <MapPin className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
-                  <span>Carrera 54 # 3A - 19, Barrio Lomas de Granada, Popayán, Cauca</span>
+                  <span>{org.addressShort}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Phone className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
-                  <span className="tabular-nums">304 410 4926 – 301 451 8052</span>
+                  <span className="tabular-nums">{org.phonesDash}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Mail className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
                   <a
-                    href="mailto:legal@fundacionulep.fun"
+                    href={`mailto:${org.emailLegal}`}
                     className="hover:text-white transition-colors"
                   >
-                    legal@fundacionulep.fun
+                    {org.emailLegal}
                   </a>
                 </li>
                 <li className="flex items-start gap-3">
                   <Clock className="w-4 h-4 text-sky-400 mt-0.5 flex-shrink-0" />
-                  <span>Lunes a Viernes · 8:00 a.m. – 5:00 p.m.</span>
+                  <span>{org.schedule}</span>
                 </li>
               </ul>
             </div>

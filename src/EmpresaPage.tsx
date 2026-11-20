@@ -12,120 +12,18 @@ import {
 } from 'lucide-react';
 import SiteLayout from './components/SiteLayout';
 import { withBase } from './utils/paths';
+import { getEmpresaData, getOrgData } from './utils/vault';
 
-const requestTypes = [
-  'Convenio Marco de Cooperación',
-  'Convenio de Prácticas Profesionales',
-  'Convenio de Formación Corporativa',
-  'Participación en Proyecto Smart Cole 1.0',
-  'Programa de Voluntariado y Trabajo Social',
-  'Patrocinio de Becas y RSE',
-  'Alianza Estratégica Interinstitucional',
-  'Publicación de Vacante (Bolsa de Empleo)'
-];
+const benefitIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  grad: GraduationCap,
+  briefcase: Briefcase,
+  users: Users,
+  award: Award,
+  handshake: Handshake,
+  headphones: Headphones
+};
 
-const agreementBenefits = [
-  {
-    title: 'Tarifas preferenciales en formación',
-    description:
-      'Acceso a descuentos y cupos corporativos en nuestros 32 cursos estudiantiles y 12 cursos administrativos para colaboradores y sus familias.',
-    icon: GraduationCap
-  },
-  {
-    title: 'Practicantes y bolsa de empleo sin costo',
-    description:
-      'Publique vacantes sin costo y vincule estudiantes en etapa práctica con acompañamiento docente y evaluación por competencias.',
-    icon: Briefcase
-  },
-  {
-    title: 'Capacitación diseñada a su medida',
-    description:
-      'Estructuramos talleres y programas cerrados según las necesidades operativas, metas y horarios de su equipo de trabajo.',
-    icon: Users
-  },
-  {
-    title: 'Certificación y soporte para Gestión Humana',
-    description:
-      'Emitimos certificados verificables de formación, constancias de convenio y reportes de asistencia para sus procesos internos.',
-    icon: Award
-  },
-  {
-    title: 'Posicionamiento en Responsabilidad Social',
-    description:
-      'Fortalezca la reputación de su marca como organización aliada de la educación y el desarrollo sostenible en el Cauca y Colombia.',
-    icon: Handshake
-  },
-  {
-    title: 'Acompañamiento institucional permanente',
-    description:
-      'Contará con un enlace directo de Fundación ULEP encargado de coordinar matrículas, actividades conjuntas y seguimiento continuo.',
-    icon: Headphones
-  }
-];
-
-const activeProjects = [
-  {
-    index: '01',
-    title: 'Proyecto Smart Cole 1.0',
-    scope: 'Innovación educativa · Tecnología',
-    description:
-      'Iniciativa orientada a fortalecer competencias digitales y tecnológicas en entornos educativos. Su empresa puede vincularse como aliada patrocinadora, proveedora de mentoría o cofinanciadora.',
-    formType: 'Participación en Proyecto Smart Cole 1.0'
-  },
-  {
-    index: '02',
-    title: 'Voluntariado Corporativo y Trabajo Social',
-    scope: 'Impacto comunitario · Certificación',
-    description:
-      'Integre a sus colaboradores en jornadas solidarias y procesos formativos comunitarios con certificación oficial de experiencia en trabajo social emitida por la Fundación.',
-    formType: 'Programa de Voluntariado y Trabajo Social'
-  },
-  {
-    index: '03',
-    title: 'Becas de Formación para el Trabajo',
-    scope: 'Responsabilidad Social Empresarial · Becas',
-    description:
-      'Apoye la formación técnica y laboral de jóvenes y adultos en condición de vulnerabilidad, generando oportunidades reales de empleabilidad con trazabilidad completa.',
-    formType: 'Patrocinio de Becas y RSE'
-  },
-  {
-    index: '04',
-    title: 'Alianzas de Empleabilidad y Prácticas',
-    scope: 'Sector productivo · Talento regional',
-    description:
-      'Participe en nuestras rutas de inserción laboral conectando directamente los perfiles certificados de Fundación ULEP con las necesidades de su empresa.',
-    formType: 'Convenio de Prácticas Profesionales'
-  }
-];
-
-const institutionalGuarantees = [
-  {
-    number: '01',
-    title: 'Respaldo legal y tributario',
-    description:
-      'Entidad Sin Ánimo de Lucro legalmente constituida con NIT 902.050.377-7, sujeta a inspección y vigilancia, con documentación vigente ante DIAN y Cámara de Comercio.'
-  },
-  {
-    number: '02',
-    title: 'Convenio claro y formalizado',
-    description:
-      'Cada alianza se respalda mediante acuerdo escrito donde se definen alcances, compromisos, cronogramas y confidencialidad sin costos ocultos.'
-  },
-  {
-    number: '03',
-    title: 'Seguimiento e informes verificables',
-    description:
-      'Entregamos evidencias, reportes de avance, certificados y resultados medibles de cada programa de formación o proyecto social ejecutado.'
-  },
-  {
-    number: '04',
-    title: 'Protección de datos garantizada',
-    description:
-      'Tratamiento responsable y seguro de la información corporativa y de participantes en cumplimiento de la Ley 1581 de 2012.'
-  }
-];
-
-function getInitialRequestType(): string {
+function getInitialRequestType(requestTypes: string[]): string {
   if (typeof window === 'undefined') return requestTypes[0];
   const param = new URLSearchParams(window.location.search).get('tipo');
   if (param && requestTypes.includes(param)) {
@@ -135,13 +33,24 @@ function getInitialRequestType(): string {
 }
 
 export default function EmpresaPage() {
+  const org = getOrgData();
+  const empresaVault = getEmpresaData();
+  const requestTypes = empresaVault.requestTypes;
+  const agreementBenefits = empresaVault.benefits.map((b) => ({
+    ...b,
+    icon: benefitIconMap[b.key] || GraduationCap
+  }));
+  const activeProjects = empresaVault.projects;
+  const institutionalGuarantees = empresaVault.guarantees;
   const [companyName, setCompanyName] = useState('');
   const [nit, setNit] = useState('');
   const [contactName, setContactName] = useState('');
   const [role, setRole] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [requestType, setRequestType] = useState<string>(getInitialRequestType);
+  const [requestType, setRequestType] = useState<string>(() =>
+    getInitialRequestType(requestTypes)
+  );
   const [details, setDetails] = useState('');
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [formError, setFormError] = useState('');
@@ -175,7 +84,6 @@ export default function EmpresaPage() {
     }
 
     setFormError('');
-    // Allow native FormSubmit POST to fundacionulep@gmail.com and display confirmation
     const savedCompany = companyName.trim();
     const savedType = requestType;
     const savedEmail = email.trim();
@@ -366,7 +274,7 @@ export default function EmpresaPage() {
             </div>
             <div className="inline-flex items-center gap-2 text-sm font-semibold text-blue-950 shrink-0">
               <ShieldCheck className="w-5 h-5 text-blue-700" />
-              <span className="tabular-nums">NIT 902.050.377-7 · Popayán, Cauca</span>
+              <span className="tabular-nums">NIT {org.nit} · Popayán, Cauca</span>
             </div>
           </div>
 
@@ -453,7 +361,7 @@ export default function EmpresaPage() {
                 </div>
               ) : (
                 <form
-                  action="https://formsubmit.co/fundacionulep@gmail.com"
+                  action={org.formAction}
                   method="POST"
                   target="_blank"
                   onSubmit={handleSubmit}

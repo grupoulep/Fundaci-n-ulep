@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import SiteLayout from './components/SiteLayout';
 import { withBase } from './utils/paths';
+import { getCoursesData, getOrgData } from './utils/vault';
 
 interface CourseItem {
   id: string;
@@ -18,41 +19,14 @@ interface CourseItem {
   image: string;
 }
 
-const COURSE_CATEGORIES = [
-  'Estudiantiles',
-  'Administrativos',
-  'Tecnología',
-  'Emprendimiento'
-];
-
-const INITIAL_COURSES: CourseItem[] = [
-  {
-    id: 'gestion-administrativa',
-    name: 'Gestión Administrativa y Contable',
-    category: 'Administrativos',
-    image: withBase('/src/assets/images/curso_gestion_admin_1795120880122.jpg')
-  },
-  {
-    id: 'herramientas-digitales',
-    name: 'Herramientas Digitales y Excel Aplicado',
-    category: 'Tecnología',
-    image: withBase('/src/assets/images/curso_herramientas_dig_1795120878056.jpg')
-  },
-  {
-    id: 'atencion-cliente',
-    name: 'Atención al Cliente y Ventas',
-    category: 'Estudiantiles',
-    image: withBase('/src/assets/images/curso_servicio_cliente_1795120985744.jpg')
-  },
-  {
-    id: 'emprendimiento-empresarial',
-    name: 'Emprendimiento y Gestión Empresarial',
-    category: 'Emprendimiento',
-    image: withBase('/src/assets/images/curso_emprendimiento_1795120881153.jpg')
-  }
-];
-
 export default function EstudiantesPage() {
+  const org = getOrgData();
+  const coursesVault = getCoursesData();
+  const COURSE_CATEGORIES = coursesVault.categories;
+  const INITIAL_COURSES: CourseItem[] = coursesVault.items.map((item) => ({
+    ...item,
+    image: withBase(item.image)
+  }));
   const [imageError, setImageError] = useState(false);
   const [failedCourseImages, setFailedCourseImages] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState('');
@@ -414,7 +388,7 @@ export default function EstudiantesPage() {
                 </div>
               ) : (
                 <form
-                  action="https://formsubmit.co/fundacionulep@gmail.com"
+                  action={org.formAction}
                   method="POST"
                   target="_blank"
                   onSubmit={handleEnrollSubmit}

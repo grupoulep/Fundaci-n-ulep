@@ -7,60 +7,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import SiteLayout from './components/SiteLayout';
 import { withBase } from './utils/paths';
+import { getHomeData } from './utils/vault';
 
 export default function App() {
-  const carouselImages = [
-    {
-      url: withBase('/assets/aistudio/1_e7975bbe.png'),
-      title: 'Fundación ULEP',
-      subtitle: 'Educación y compromiso con la comunidad'
-    },
-    {
-      url: withBase('/assets/aistudio/2_07cc1b38.png'),
-      title: 'Realiza y consulta tus pagos aquí',
-      subtitle: 'Paga tus facturas ULEP y descarga tus certificados'
-    }
-  ];
-
-  const eventsData = [
-    {
-      image: withBase('/assets/aistudio/1_34f12066.png'),
-      date: '19 Nov 2026',
-      title: 'Proyecto Smart Cole 1.0 - Fundación ULEP'
-    },
-    {
-      image: withBase('/assets/aistudio/2_f5d2c5c7.png'),
-      date: '19 Nov 2026',
-      title: 'Certificado de Voluntariado - Fundación ULEP'
-    }
-  ];
-
-  const welcomeTimeline = [
-    {
-      step: '01',
-      title: 'Da el primer paso hoy',
-      message: 'Tu futuro cambia en el instante en que decides formarte. En ULEP las puertas están abiertas para ti.',
-      detail: 'Inicia desde cero o fortalece tus habilidades con rutas claras y acompañamiento cercano.'
-    },
-    {
-      step: '02',
-      title: 'Aprende con propósito real',
-      message: 'Estudia contenidos prácticos diseñados para los retos del mundo laboral y empresarial actual.',
-      detail: 'Cursos estudiantiles y administrativos flexibles para avanzar a tu ritmo desde cualquier lugar.'
-    },
-    {
-      step: '03',
-      title: 'Certifica tu talento',
-      message: 'Cada logro suma: respalda tu hoja de vida con certificados y experiencia que abren nuevas puertas.',
-      detail: 'Formación institucional y proyectos de voluntariado que destacan tu perfil profesional.'
-    },
-    {
-      step: '04',
-      title: 'Transforma tu futuro en ULEP',
-      message: 'No postergues tus metas. Únete a nuestra comunidad de estudiantes y construye nuevas oportunidades.',
-      detail: 'Más de 350 estudiantes activos ya confían en Fundación ULEP para crecer cada día.'
-    }
-  ];
+  const homeData = getHomeData();
+  const carouselImages = homeData.carousel.map((item) => ({
+    ...item,
+    url: withBase(item.url)
+  }));
+  const eventsData = homeData.events.map((item) => ({
+    ...item,
+    image: withBase(item.image)
+  }));
+  const welcomeTimeline = homeData.timeline;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mapImageError, setMapImageError] = useState(false);
@@ -193,12 +152,7 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-0 lg:divide-x lg:divide-gray-200">
-              {[
-                { value: '350', label: 'Estudiantes activos' },
-                { value: '32', label: 'Cursos estudiantiles' },
-                { value: '12', label: 'Cursos administrativos' },
-                { value: '4', label: 'Proyectos vigentes' }
-              ].map((stat) => (
+              {homeData.stats.map((stat) => (
                 <div key={stat.label} className="text-center px-6 py-2">
                   <p className="text-4xl sm:text-5xl font-black text-blue-600 tabular-nums tracking-tight">
                     {stat.value}

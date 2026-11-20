@@ -1,7 +1,9 @@
 import React from 'react';
 import SiteLayout from './components/SiteLayout';
+import { getOrgData } from './utils/vault';
 
 export default function PrivacyPolicyPage() {
+  const org = getOrgData();
   return (
     <SiteLayout>
       <main className="w-full flex-1 bg-white">
@@ -32,25 +34,27 @@ export default function PrivacyPolicyPage() {
                 </li>
                 <li>
                   <strong className="font-semibold text-gray-900">NIT:</strong>{' '}
-                  <span className="tabular-nums">902.050.377-7</span>
+                  <span className="tabular-nums">{org.nit}</span>
                 </li>
                 <li>
-                  <strong className="font-semibold text-gray-900">Domicilio Principal:</strong> Carrera 54 # 3A - 19, Barrio Lomas de Granada, Popayán, Cauca, Colombia
+                  <strong className="font-semibold text-gray-900">Domicilio Principal:</strong>{' '}
+                  {org.addressFull}
                 </li>
                 <li>
-                  <strong className="font-semibold text-gray-900">Representante Legal:</strong> Jerson Stiven López Rengifo
+                  <strong className="font-semibold text-gray-900">Representante Legal:</strong>{' '}
+                  {org.legalRep}
                 </li>
                 <li>
                   <strong className="font-semibold text-gray-900">Teléfonos:</strong>{' '}
-                  <span className="tabular-nums">304 410 4926 – 301 451 8052</span>
+                  <span className="tabular-nums">{org.phonesDash}</span>
                 </li>
                 <li>
                   <strong className="font-semibold text-gray-900">Sitio Web:</strong>{' '}
                   <a
-                    href="https://fundacionulep.fun"
+                    href={org.websiteUrl}
                     className="text-blue-700 hover:text-blue-900 underline underline-offset-2"
                   >
-                    https://fundacionulep.fun
+                    {org.websiteUrl}
                   </a>
                 </li>
                 <li>
@@ -58,10 +62,10 @@ export default function PrivacyPolicyPage() {
                     Correo Electrónico para Protección de Datos (PQR):
                   </strong>{' '}
                   <a
-                    href="mailto:legal@fundacionulep.fun"
+                    href={`mailto:${org.emailLegal}`}
                     className="text-blue-700 hover:text-blue-900 underline underline-offset-2"
                   >
-                    legal@fundacionulep.fun
+                    {org.emailLegal}
                   </a>
                 </li>
               </ul>
@@ -155,12 +159,12 @@ export default function PrivacyPolicyPage() {
               <p>
                 El área responsable de atender las peticiones, consultas y reclamos sobre datos personales puede ser contactada a través del correo electrónico{' '}
                 <a
-                  href="mailto:legal@fundacionulep.fun"
+                  href={`mailto:${org.emailLegal}`}
                   className="text-blue-700 hover:text-blue-900 underline underline-offset-2"
                 >
-                  legal@fundacionulep.fun
+                  {org.emailLegal}
                 </a>{' '}
-                o mediante comunicación escrita dirigida a la Carrera 54 # 3A - 19, Barrio Lomas de Granada, Popayán, Cauca.
+                o mediante comunicación escrita dirigida a la {org.addressShort}.
               </p>
               <ul className="space-y-3 list-disc pl-6 marker:text-blue-600">
                 <li>

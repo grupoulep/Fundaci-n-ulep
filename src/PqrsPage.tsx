@@ -12,24 +12,7 @@ import {
 } from 'lucide-react';
 import SiteLayout from './components/SiteLayout';
 import { withBase } from './utils/paths';
-
-const pqrsTypes = [
-  'Petición',
-  'Queja',
-  'Reclamo',
-  'Sugerencia',
-  'Felicitación',
-  'Protección de Datos Personales (Habeas Data)'
-];
-
-const relatedAreas = [
-  'Programas, Cursos y Formación',
-  'Voluntariado',
-  'Empresas, Convenios y Alianzas',
-  'Donaciones y Administración',
-  'Privacidad, Datos y Asuntos Legales',
-  'Atención General'
-];
+import { getOrgData, getPqrsData } from './utils/vault';
 
 interface FaqItem {
   id: string;
@@ -43,7 +26,9 @@ interface FaqCategory {
   items: FaqItem[];
 }
 
-const faqCategories: FaqCategory[] = [
+function buildFaqCategories(): FaqCategory[] {
+  const org = getOrgData();
+  return [
   {
     title: 'Sobre FUNDACIÓN ULEP',
     items: [
@@ -57,7 +42,7 @@ const faqCategories: FaqCategory[] = [
             Sin Ánimo de Lucro (ESAL) de derecho privado, autónoma y de utilidad común, dedicada a
             transformar realidades y promover el desarrollo comunitario mediante la educación, el
             voluntariado y la inclusión social. Está identificada con el{' '}
-            <span className="font-semibold text-blue-950 tabular-nums">NIT 902.050.377-7</span>.
+            <span className="font-semibold text-blue-950 tabular-nums">NIT {org.nit}</span>.
           </p>
         )
       },
@@ -68,9 +53,7 @@ const faqCategories: FaqCategory[] = [
         answer: (
           <p>
             Nuestra sede principal se encuentra en la{' '}
-            <strong className="font-semibold text-blue-950">
-              Carrera 54 # 3A - 19, Barrio Lomas de Granada, Popayán, Cauca, Colombia
-            </strong>
+            <strong className="font-semibold text-blue-950">{org.addressFull}</strong>
             . Aunque nuestro domicilio principal es Popayán, contamos con la capacidad estatutaria
             para desarrollar actividades, proyectos y convenios en otros municipios y ciudades del
             país, así como en el exterior.
@@ -132,12 +115,12 @@ const faqCategories: FaqCategory[] = [
           <p>
             Las convocatorias vigentes se publican en nuestro sitio web{' '}
             <a
-              href="https://fundacionulep.fun"
+              href={org.websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-700 font-medium hover:underline underline-offset-2"
             >
-              https://fundacionulep.fun
+              {org.websiteUrl}
             </a>{' '}
             y en nuestros canales oficiales. Para participar, solo debes diligenciar el formulario
             de inscripción correspondiente en la sección de{' '}
@@ -149,10 +132,10 @@ const faqCategories: FaqCategory[] = [
             </a>{' '}
             o escribir a{' '}
             <a
-              href="mailto:contacto@fundacionulep.fun"
+              href={`mailto:${org.emailContact}`}
               className="text-blue-700 font-medium hover:underline underline-offset-2"
             >
-              contacto@fundacionulep.fun
+              {org.emailContact}
             </a>{' '}
             indicando el programa de tu interés.
           </p>
@@ -255,10 +238,10 @@ const faqCategories: FaqCategory[] = [
             </a>{' '}
             o escribir a{' '}
             <a
-              href="mailto:contacto@fundacionulep.fun"
+              href={`mailto:${org.emailContact}`}
               className="text-blue-700 font-medium hover:underline underline-offset-2"
             >
-              contacto@fundacionulep.fun
+              {org.emailContact}
             </a>
             .
           </p>
@@ -273,12 +256,12 @@ const faqCategories: FaqCategory[] = [
             Todas las donaciones deben realizarse exclusivamente a través de los canales oficiales
             publicados en{' '}
             <a
-              href="https://fundacionulep.fun"
+              href={org.websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-700 font-medium hover:underline underline-offset-2"
             >
-              https://fundacionulep.fun
+              {org.websiteUrl}
             </a>{' '}
             o en cuentas bancarias a nombre de{' '}
             <strong className="font-semibold text-blue-950">FUNDACIÓN ULEP</strong>. Los recursos
@@ -286,10 +269,10 @@ const faqCategories: FaqCategory[] = [
             sociales, educativos, deportivos y tecnológicos. Para solicitar comprobantes o soporte
             administrativo de tu aporte, escribe a{' '}
             <a
-              href="mailto:administracion@fundacionulep.fun"
+              href={`mailto:${org.emailAdmin}`}
               className="text-blue-700 font-medium hover:underline underline-offset-2"
             >
-              administracion@fundacionulep.fun
+              {org.emailAdmin}
             </a>
             .
           </p>
@@ -311,10 +294,10 @@ const faqCategories: FaqCategory[] = [
             utilizan únicamente para las finalidades autorizadas por el titular. Si deseas conocer,
             actualizar, rectificar o suprimir tu información personal, puedes enviar tu solicitud a{' '}
             <a
-              href="mailto:legal@fundacionulep.fun"
+              href={`mailto:${org.emailLegal}`}
               className="text-blue-700 font-medium hover:underline underline-offset-2"
             >
-              legal@fundacionulep.fun
+              {org.emailLegal}
             </a>{' '}
             o consultar nuestra{' '}
             <a
@@ -338,10 +321,10 @@ const faqCategories: FaqCategory[] = [
                 Consultas generales, programas y voluntariado:
               </strong>{' '}
               <a
-                href="mailto:contacto@fundacionulep.fun"
+                href={`mailto:${org.emailContact}`}
                 className="text-blue-700 font-medium hover:underline underline-offset-2"
               >
-                contacto@fundacionulep.fun
+                {org.emailContact}
               </a>
             </li>
             <li>
@@ -349,10 +332,10 @@ const faqCategories: FaqCategory[] = [
                 Donaciones, comprobantes y temas contables:
               </strong>{' '}
               <a
-                href="mailto:administracion@fundacionulep.fun"
+                href={`mailto:${org.emailAdmin}`}
                 className="text-blue-700 font-medium hover:underline underline-offset-2"
               >
-                administracion@fundacionulep.fun
+                {org.emailAdmin}
               </a>
             </li>
             <li>
@@ -360,19 +343,19 @@ const faqCategories: FaqCategory[] = [
                 Protección de datos personales (PQR) y asuntos legales:
               </strong>{' '}
               <a
-                href="mailto:legal@fundacionulep.fun"
+                href={`mailto:${org.emailLegal}`}
                 className="text-blue-700 font-medium hover:underline underline-offset-2"
               >
-                legal@fundacionulep.fun
+                {org.emailLegal}
               </a>
             </li>
             <li>
               <strong className="font-semibold text-blue-950">Teléfono de contacto:</strong>{' '}
-              <span className="tabular-nums">(+57) 316 900 8561</span>
+              <span className="tabular-nums">{org.phoneMain}</span>
             </li>
             <li>
-              <strong className="font-semibold text-blue-950">Dirección física:</strong> Carrera 54
-              # 3A - 19, Barrio Lomas de Granada, Popayán, Cauca.
+              <strong className="font-semibold text-blue-950">Dirección física:</strong>{' '}
+              {org.addressShort}.
             </li>
           </ul>
         )
@@ -380,8 +363,14 @@ const faqCategories: FaqCategory[] = [
     ]
   }
 ];
+}
 
 export default function PqrsPage() {
+  const org = getOrgData();
+  const pqrsVault = getPqrsData();
+  const pqrsTypes = pqrsVault.types;
+  const relatedAreas = pqrsVault.areas;
+  const faqCategories = buildFaqCategories();
   // PQRS Form State
   const [pqrsType, setPqrsType] = useState(pqrsTypes[0]);
   const [area, setArea] = useState(relatedAreas[0]);
@@ -533,7 +522,7 @@ export default function PqrsPage() {
                 </div>
               ) : (
                 <form
-                  action="https://formsubmit.co/fundacionulep@gmail.com"
+                  action={org.formAction}
                   method="POST"
                   target="_blank"
                   onSubmit={handleSubmit}
@@ -694,7 +683,7 @@ export default function PqrsPage() {
                         required
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        placeholder="Ej. 316 900 8561"
+                        placeholder={org.phonePlaceholder}
                         className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-gray-300 text-sm text-gray-900 tabular-nums focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-100"
                       />
                     </div>
@@ -815,10 +804,10 @@ export default function PqrsPage() {
                         General y voluntariado
                       </p>
                       <a
-                        href="mailto:contacto@fundacionulep.fun"
+                        href={`mailto:${org.emailContact}`}
                         className="text-blue-700 hover:underline break-all"
                       >
-                        contacto@fundacionulep.fun
+                        {org.emailContact}
                       </a>
                     </div>
                   </li>
@@ -829,10 +818,10 @@ export default function PqrsPage() {
                         Donaciones y contabilidad
                       </p>
                       <a
-                        href="mailto:administracion@fundacionulep.fun"
+                        href={`mailto:${org.emailAdmin}`}
                         className="text-blue-700 hover:underline break-all"
                       >
-                        administracion@fundacionulep.fun
+                        {org.emailAdmin}
                       </a>
                     </div>
                   </li>
@@ -843,20 +832,20 @@ export default function PqrsPage() {
                         Datos personales (PQR) y legal
                       </p>
                       <a
-                        href="mailto:legal@fundacionulep.fun"
+                        href={`mailto:${org.emailLegal}`}
                         className="text-blue-700 hover:underline break-all"
                       >
-                        legal@fundacionulep.fun
+                        {org.emailLegal}
                       </a>
                     </div>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Phone className="w-4 h-4 text-blue-700 mt-0.5 shrink-0" />
-                    <span className="tabular-nums">(+57) 316 900 8561</span>
+                    <span className="tabular-nums">{org.phoneMain}</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <MapPin className="w-4 h-4 text-blue-700 mt-0.5 shrink-0" />
-                    <span>Carrera 54 # 3A - 19, Barrio Lomas de Granada, Popayán, Cauca</span>
+                    <span>{org.addressShort}</span>
                   </li>
                 </ul>
               </div>

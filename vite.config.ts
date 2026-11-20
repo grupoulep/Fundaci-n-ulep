@@ -13,37 +13,6 @@ export default defineConfig(() => {
     plugins: [
       react(),
       tailwindcss(),
-      // Enforces HTTPS and upgrades insecure requests across all production HTML pages.
-      {
-        name: 'enforce-https-production',
-        apply: 'build',
-        transformIndexHtml() {
-          return [
-            {
-              tag: 'meta',
-              attrs: {
-                'http-equiv': 'Content-Security-Policy',
-                content: 'upgrade-insecure-requests',
-              },
-              injectTo: 'head-prepend',
-            },
-            {
-              tag: 'meta',
-              attrs: {
-                name: 'referrer',
-                content: 'strict-origin-when-cross-origin',
-              },
-              injectTo: 'head-prepend',
-            },
-            {
-              tag: 'script',
-              children:
-                "(function(){var h=window.location.hostname;var l=h==='localhost'||h==='127.0.0.1'||h==='[::1]'||h==='0.0.0.0'||/^192\\.168\\./.test(h)||/^10\\./.test(h)||h.endsWith('.local');if(window.location.protocol==='http:'&&!l){window.location.replace('https://'+h+window.location.pathname+window.location.search+window.location.hash);}})();",
-              injectTo: 'head-prepend',
-            },
-          ];
-        },
-      },
       // Copies src/assets into dist/ so root-relative URLs like
       // "/src/assets/images/..." (e.g. generate_image output) still resolve
       // in production builds. Do not remove.

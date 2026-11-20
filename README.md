@@ -13,13 +13,12 @@ El proyecto incluye el flujo de integración continua en `.github/workflows/depl
 3. En **Build and deployment → Source**, selecciona **GitHub Actions**.
 4. Cada vez que hagas `push` a `main` o `master` (o ejecutes el flujo manualmente desde la pestaña **Actions**), el sitio se compilará y publicará automáticamente.
 
-### Dominio personalizado y HTTPS obligatorio
+### Dominio personalizado (opcional)
 
-El código incluye redirección automática obligatoria de `http://` a `https://` y política `upgrade-insecure-requests` en todas las páginas compiladas. Para completar la seguridad a nivel de servidor en GitHub Pages:
+Si deseas conectarlo a `fundacionulep.fun`:
 
-1. En **Settings → Pages → Custom domain**, escribe `fundacionulep.fun` y guarda (si usas dominio propio).
-2. Configura los registros DNS (`A` o `CNAME`) en tu proveedor de dominio apuntando a GitHub Pages.
-3. Marca la casilla **Enforce HTTPS** en **Settings → Pages**.
+1. En **Settings → Pages → Custom domain**, escribe `fundacionulep.fun` y guarda.
+2. Configura los registros DNS (`A` o `CNAME`) en tu proveedor de dominio apuntando a GitHub Pages y habilita **Enforce HTTPS**.
 
 ## Desarrollo local
 

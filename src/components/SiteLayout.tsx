@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   ChevronDown,
   Menu,
@@ -13,7 +13,6 @@ import {
   Youtube
 } from 'lucide-react';
 import { withBase } from '../utils/paths';
-import { enforceHttps } from '../utils/security';
 
 interface SiteLayoutProps {
   children: React.ReactNode;
@@ -102,10 +101,6 @@ const menuItems: MenuItem[] = [
 export default function SiteLayout({ children }: SiteLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openSubmenuIndex, setOpenSubmenuIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    enforceHttps();
-  }, []);
 
   const handleSubitemClick = (e: React.MouseEvent<HTMLAnchorElement>, sub: SubItem) => {
     if (sub.targetId) {

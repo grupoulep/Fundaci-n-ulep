@@ -125,7 +125,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
         <div className="w-full max-w-[1000px] mx-auto flex items-center justify-center py-4 px-4">
           <a href={withBase('/')} aria-label="Ir al inicio de Fundación ULEP">
             <img
-              src={withBase('/assets/aistudio/FUN_AZUL_8fb1ebfe')}
+              src={withBase('/assets/aistudio/FUN_AZUL_8fb1ebfe.png')}
               alt="Fundación ULEP Logo"
               className="h-14 md:h-16 lg:h-20 object-contain mx-auto"
             />
@@ -247,7 +247,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
                 aria-label="Inicio Fundación ULEP"
               >
                 <img
-                  src={withBase('/assets/aistudio/FUN_AZUL_8fb1ebfe')}
+                  src={withBase('/assets/aistudio/FUN_AZUL_8fb1ebfe.png')}
                   alt="Fundación ULEP Logo"
                   className="h-10 object-contain"
                 />

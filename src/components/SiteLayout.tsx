@@ -130,7 +130,8 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Logo Section (scrolls away) */}
       <div className="w-full bg-white">
-        <div className="w-full max-w-[1000px] mx-auto flex items-center justify-center py-4 px-4">
+        <div className="w-full max-w-[1000px] mx-auto grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-4 px-4">
+          <div aria-hidden="true" />
           <a href={withBase('/')} aria-label="Ir al inicio de Fundación ULEP">
             <img
               src={withBase(media.logoPrimary)}
@@ -138,6 +139,14 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
               className="h-14 md:h-16 lg:h-20 object-contain mx-auto"
             />
           </a>
+          <div className="flex justify-end">
+            <a
+              href={withBase('/admin.html')}
+              className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            >
+              Login
+            </a>
+          </div>
         </div>
       </div>
 

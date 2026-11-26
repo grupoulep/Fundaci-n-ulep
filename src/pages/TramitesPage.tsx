@@ -41,8 +41,9 @@ export default function TramitesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <a
               id="zona-pagos"
-              href="#"
-              onClick={(e) => e.preventDefault()}
+              href={withBase('/zona-pagos.html')}
+              target="_blank"
+              rel="noopener noreferrer"
               className="scroll-mt-24 group w-full h-[96px] bg-gray-50 hover:bg-gray-100 border-2 border-blue-400 py-2.5 px-5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98]"
               style={{ height: '96px' }}
             >

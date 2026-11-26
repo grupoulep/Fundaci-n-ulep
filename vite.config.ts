@@ -1,14 +1,13 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import fs from 'fs';
 import path from 'path';
-import {fileURLToPath} from 'url';
-import {defineConfig} from 'vite';
+import { fileURLToPath } from 'url';
+import { defineConfig } from 'vite';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export default defineConfig(({command}) => {
+export default defineConfig(({ command }) => {
   const base = command === 'build' ? './' : '/';
 
   return {
@@ -16,22 +15,27 @@ export default defineConfig(({command}) => {
     plugins: [
       react(),
       tailwindcss(),
-      // Copies src/assets into dist/ so image paths like
-      // "src/assets/images/..." (e.g. generate_image output) still resolve
-      // in production builds. Do not remove.
       {
-        name: 'copy-unbundled-src-assets',
+        name: 'inject-production-security-headers',
         apply: 'build',
-        closeBundle(error?: Error): void {
-          if (error) {
-            return;
-          }
-          const distDir = path.resolve(__dirname, 'dist');
-          const srcAssets = path.resolve(__dirname, 'src/assets');
-          const distAssets = path.resolve(distDir, 'src/assets');
-          if (fs.existsSync(distDir) && fs.existsSync(srcAssets)) {
-            fs.cpSync(srcAssets, distAssets, {recursive: true, force: true});
-          }
+        transformIndexHtml(html: string) {
+          const csp = [
+            "default-src 'self'",
+            "script-src 'self'",
+            "style-src 'self' 'unsafe-inline'",
+            "img-src 'self' https: data:",
+            "font-src 'self' https: data:",
+            "connect-src 'self' https://formsubmit.co",
+            "form-action 'self' https://formsubmit.co",
+            "base-uri 'self'",
+            "object-src 'none'",
+            'upgrade-insecure-requests',
+          ].join('; ');
+          const securityMeta = `    <meta http-equiv="Content-Security-Policy" content="${csp}" />`;
+          return html.replace(
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+            `<meta name="viewport" content="width=device-width, initial-scale=1.0" />\n${securityMeta}`
+          );
         },
       },
     ],
@@ -48,18 +52,19 @@ export default defineConfig(({command}) => {
           politicaPrivacidad: path.resolve(__dirname, 'politica-privacidad.html'),
           terminosDeUso: path.resolve(__dirname, 'terminos-de-uso.html'),
           estudiantes: path.resolve(__dirname, 'estudiantes.html'),
+          campus: path.resolve(__dirname, 'campus.html'),
+          cursos: path.resolve(__dirname, 'cursos.html'),
           empresa: path.resolve(__dirname, 'empresa.html'),
           tramites: path.resolve(__dirname, 'tramites.html'),
           pqrs: path.resolve(__dirname, 'pqrs.html'),
+          preguntasFrecuentes: path.resolve(__dirname, 'preguntas-frecuentes.html'),
+          transparencia: path.resolve(__dirname, 'transparencia.html'),
           donaciones: path.resolve(__dirname, 'donaciones.html'),
         },
       },
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
-      // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
   };

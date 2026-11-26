@@ -12,8 +12,8 @@ import {
   Linkedin,
   Youtube
 } from 'lucide-react';
-import { withBase } from '../utils/paths';
-import { getOrgData } from '../utils/vault';
+import { withBase } from '../security/paths';
+import { getMediaData, getOrgData } from '../security/vault';
 
 interface SiteLayoutProps {
   children: React.ReactNode;
@@ -42,10 +42,10 @@ const menuItems: MenuItem[] = [
   },
   {
     title: 'ESTUDIANTES',
-    href: '/estudiantes.html',
+    href: '/campus.html',
     subitems: [
-      { label: 'Campus', href: '/estudiantes.html#campus-virtual', targetId: 'campus-virtual' },
-      { label: 'Cursos', href: '/estudiantes.html#cursos', targetId: 'cursos' }
+      { label: 'Campus', href: '/campus.html' },
+      { label: 'Cursos', href: '/cursos.html' }
     ]
   },
   {
@@ -75,27 +75,32 @@ const menuItems: MenuItem[] = [
     href: '/tramites.html',
     subitems: [
       { label: 'Pagos en Línea', href: '/tramites.html#zona-pagos', targetId: 'zona-pagos' },
-      { label: 'Donaciones', href: '/tramites.html#donaciones', targetId: 'donaciones' },
-      { label: 'Certificados' },
-      { label: 'Solicitudes Generales' },
-      { label: 'Homologaciones' }
-    ]
-  },
-  {
-    title: 'PQRS',
-    href: '/pqrs.html',
-    subitems: [
       {
-        label: 'Radicar Solicitud',
-        href: '/pqrs.html#radicar-solicitud',
-        targetId: 'radicar-solicitud'
+        label: 'PQRS',
+        href: '/pqrs.html'
       },
       {
         label: 'Preguntas Frecuentes',
-        href: '/pqrs.html#preguntas-frecuentes',
-        targetId: 'preguntas-frecuentes'
+        href: '/preguntas-frecuentes.html'
+      },
+      { label: 'Donaciones', href: '/tramites.html#donaciones', targetId: 'donaciones' },
+      { label: 'Paz y Salvo', href: '/tramites.html#paz-y-salvo', targetId: 'paz-y-salvo' },
+      {
+        label: 'Consulta tus Pagos',
+        href: '/tramites.html#consulta-pagos',
+        targetId: 'consulta-pagos'
+      },
+      {
+        label: 'Certificados',
+        href: '/tramites.html#certificados',
+        targetId: 'certificados'
       }
     ]
+  },
+  {
+    title: 'TRANSPARENCIA',
+    href: '/transparencia.html',
+    subitems: []
   }
 ];
 
@@ -103,6 +108,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openSubmenuIndex, setOpenSubmenuIndex] = useState<number | null>(null);
   const org = getOrgData();
+  const media = getMediaData();
 
   const handleSubitemClick = (e: React.MouseEvent<HTMLAnchorElement>, sub: SubItem) => {
     if (sub.targetId) {
@@ -127,7 +133,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
         <div className="w-full max-w-[1000px] mx-auto flex items-center justify-center py-4 px-4">
           <a href={withBase('/')} aria-label="Ir al inicio de Fundación ULEP">
             <img
-              src={withBase('/assets/aistudio/FUN_AZUL_8fb1ebfe.png')}
+              src={withBase(media.logoPrimary)}
               alt="Fundación ULEP Logo"
               className="h-14 md:h-16 lg:h-20 object-contain mx-auto"
             />
@@ -153,34 +159,41 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
           {/* Desktop Navigation Menu */}
           <nav className="w-full hidden md:flex justify-center py-2.5">
             <ul className="flex flex-wrap justify-center items-center gap-2 lg:gap-6">
-              {menuItems.map((item, index) => (
-                <li key={index} className="relative group py-1">
-                  <a
-                    href={item.href ? withBase(item.href) : '#'}
-                    onClick={item.href ? undefined : (e) => e.preventDefault()}
-                    className="flex items-center gap-1 px-3 py-2 text-sm lg:text-base font-semibold text-blue-900 hover:text-blue-600 transition-colors rounded-md hover:bg-blue-50"
-                  >
-                    {item.title}
-                    <ChevronDown className="w-4 h-4 text-blue-700 transition-transform duration-200 group-hover:rotate-180" />
-                  </a>
+              {menuItems.map((item, index) => {
+                const hasSubitems = item.subitems.length > 0;
+                return (
+                  <li key={index} className="relative group py-1">
+                    <a
+                      href={item.href ? withBase(item.href) : '#'}
+                      onClick={item.href ? undefined : (e) => e.preventDefault()}
+                      className="flex items-center gap-1 px-3 py-2 text-sm lg:text-base font-semibold text-blue-900 hover:text-blue-600 transition-colors rounded-md hover:bg-blue-50"
+                    >
+                      {item.title}
+                      {hasSubitems && (
+                        <ChevronDown className="w-4 h-4 text-blue-700 transition-transform duration-200 group-hover:rotate-180" />
+                      )}
+                    </a>
 
-                  {/* Dropdown List */}
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <div className="bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden py-1">
-                      {item.subitems.map((sub, subIdx) => (
-                        <a
-                          key={subIdx}
-                          href={sub.href ? withBase(sub.href) : '#'}
-                          onClick={(e) => handleSubitemClick(e, sub)}
-                          className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-600 hover:text-white transition-colors"
-                        >
-                          {sub.label}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </li>
-              ))}
+                    {/* Dropdown List */}
+                    {hasSubitems && (
+                      <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <div className="bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden py-1">
+                          {item.subitems.map((sub, subIdx) => (
+                            <a
+                              key={subIdx}
+                              href={sub.href ? withBase(sub.href) : '#'}
+                              onClick={(e) => handleSubitemClick(e, sub)}
+                              className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-600 hover:text-white transition-colors"
+                            >
+                              {sub.label}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </div>
@@ -189,46 +202,60 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-100 px-4 py-3 shadow-lg">
             <ul className="flex flex-col space-y-2">
-              {menuItems.map((item, index) => (
-                <li key={index} className="border-b border-gray-50 last:border-none pb-2">
-                  <div
-                    onClick={() => setOpenSubmenuIndex(openSubmenuIndex === index ? null : index)}
-                    className="flex items-center justify-between py-2 text-sm font-semibold text-blue-950 cursor-pointer"
-                  >
-                    {item.href ? (
+              {menuItems.map((item, index) => {
+                const hasSubitems = item.subitems.length > 0;
+                return (
+                  <li key={index} className="border-b border-gray-50 last:border-none pb-2">
+                    {hasSubitems ? (
+                      <>
+                        <div
+                          onClick={() => setOpenSubmenuIndex(openSubmenuIndex === index ? null : index)}
+                          className="flex items-center justify-between py-2 text-sm font-semibold text-blue-950 cursor-pointer"
+                        >
+                          {item.href ? (
+                            <a
+                              href={withBase(item.href)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="hover:text-blue-600 transition-colors"
+                            >
+                              {item.title}
+                            </a>
+                          ) : (
+                            <span>{item.title}</span>
+                          )}
+                          <ChevronDown
+                            className={`w-4 h-4 transition-transform duration-200 ${
+                              openSubmenuIndex === index ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </div>
+                        {openSubmenuIndex === index && (
+                          <ul className="pl-4 py-1 space-y-1 bg-gray-50 rounded-md">
+                            {item.subitems.map((sub, subIdx) => (
+                              <li key={subIdx}>
+                                <a
+                                  href={sub.href ? withBase(sub.href) : '#'}
+                                  onClick={(e) => handleSubitemClick(e, sub)}
+                                  className="block py-1.5 text-xs text-gray-600 hover:text-blue-600"
+                                >
+                                  {sub.label}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </>
+                    ) : (
                       <a
-                        href={withBase(item.href)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="hover:text-blue-600 transition-colors"
+                        href={item.href ? withBase(item.href) : '#'}
+                        className="block py-2 text-sm font-semibold text-blue-950 hover:text-blue-600 transition-colors"
                       >
                         {item.title}
                       </a>
-                    ) : (
-                      <span>{item.title}</span>
                     )}
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-200 ${
-                        openSubmenuIndex === index ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </div>
-                  {openSubmenuIndex === index && (
-                    <ul className="pl-4 py-1 space-y-1 bg-gray-50 rounded-md">
-                      {item.subitems.map((sub, subIdx) => (
-                        <li key={subIdx}>
-                          <a
-                            href={sub.href ? withBase(sub.href) : '#'}
-                            onClick={(e) => handleSubitemClick(e, sub)}
-                            className="block py-1.5 text-xs text-gray-600 hover:text-blue-600"
-                          >
-                            {sub.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
@@ -245,13 +272,13 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
             <div className="space-y-5">
               <a
                 href={withBase('/')}
-                className="inline-flex items-center bg-white px-4 py-2.5 rounded-xl shadow-sm"
+                className="inline-flex items-center"
                 aria-label="Inicio Fundación ULEP"
               >
                 <img
-                  src={withBase('/assets/aistudio/FUN_AZUL_8fb1ebfe.png')}
+                  src={withBase(media.logoFooter)}
                   alt="Fundación ULEP Logo"
-                  className="h-10 object-contain"
+                  className="h-16 object-contain"
                 />
               </a>
               <p className="text-sm text-blue-200/90 leading-relaxed max-w-xs">
@@ -285,10 +312,11 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
               <ul className="space-y-3 text-sm">
                 {[
                   { label: 'Inicio', href: '/' },
-                  { label: 'Estudiantes', href: '/estudiantes.html' },
+                  { label: 'Campus Virtual', href: '/campus.html' },
+                  { label: 'Cursos', href: '/cursos.html' },
                   { label: 'Empresa', href: '/empresa.html' },
                   { label: 'Trámites', href: '/tramites.html' },
-                  { label: 'PQRS', href: '/pqrs.html' }
+                  { label: 'Transparencia', href: '/transparencia.html' }
                 ].map((link) => (
                   <li key={link.label}>
                     <a
@@ -312,8 +340,8 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
                   { label: 'Zona de Pagos', href: '/tramites.html#zona-pagos' },
                   { label: 'Donaciones', href: '/tramites.html#donaciones' },
                   { label: 'Diligencia tu PQRS', href: '/pqrs.html' },
-                  { label: 'Certificados y Constancias' },
-                  { label: 'Preguntas Frecuentes', href: '/pqrs.html#preguntas-frecuentes' }
+                  { label: 'Certificados y Constancias', href: '/tramites.html#certificados' },
+                  { label: 'Preguntas Frecuentes', href: '/preguntas-frecuentes.html' }
                 ].map((service) => (
                   <li key={service.label}>
                     <a

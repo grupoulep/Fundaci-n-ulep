@@ -1,0 +1,463 @@
+{
+  "entities": {
+    "PaymentQuery": {
+      "title": "PaymentQuery",
+      "description": "Registro de consulta de pago asociado a un número de cédula, administrado desde el panel interno y consultable por cédula exacta.",
+      "type": "object",
+      "properties": {
+        "cedula": {
+          "type": "string",
+          "description": "Número de cédula del titular (solo dígitos).",
+          "minLength": 5,
+          "maxLength": 15,
+          "pattern": "^[0-9]{5,15}$"
+        },
+        "reference": {
+          "type": "string",
+          "description": "Número o código de referencia del pago.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "amount": {
+          "type": "string",
+          "description": "Valor o monto a pagar mostrado al consultar.",
+          "maxLength": 40
+        },
+        "concept": {
+          "type": "string",
+          "description": "Concepto o detalle breve del pago.",
+          "maxLength": 160
+        },
+        "isPaid": {
+          "type": "boolean",
+          "description": "Indica si el pago ya se encuentra cancelado (true) o pendiente (false)."
+        },
+        "hasDueDate": {
+          "type": "boolean",
+          "description": "Indica si existe una fecha límite de pago (true) o si no tiene fecha límite (false)."
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "Fecha límite en formato YYYY-MM-DD cuando hasDueDate es true, o cadena vacía cuando no tiene fecha.",
+          "maxLength": 20,
+          "pattern": "^([0-9]{4}-[0-9]{2}-[0-9]{2})?$"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "UID del administrador que creó o actualizó el registro.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo de creación generada por el servidor."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo de última actualización generada por el servidor."
+        }
+      },
+      "required": [
+        "cedula",
+        "reference",
+        "amount",
+        "concept",
+        "isPaid",
+        "hasDueDate",
+        "dueDate",
+        "updatedBy",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PazYSalvo": {
+      "title": "PazYSalvo",
+      "description": "Registro público de Paz y Salvo con número de registro, nombre, descripción desplegable y enlace HTTPS de descarga.",
+      "type": "object",
+      "properties": {
+        "registrationNumber": {
+          "type": "string",
+          "description": "Número de registro del Paz y Salvo.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "name": {
+          "type": "string",
+          "description": "Nombre del Paz y Salvo o titular.",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "description": {
+          "type": "string",
+          "description": "Pequeña descripción desplegable del Paz y Salvo.",
+          "maxLength": 500
+        },
+        "downloadUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Enlace HTTPS de descarga del documento de Paz y Salvo.",
+          "minLength": 8,
+          "maxLength": 500,
+          "pattern": "^https://.+"
+        },
+        "isPublished": {
+          "type": "boolean",
+          "description": "Indica si el registro es visible en el listado público de Paz y Salvo."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "UID del administrador que registró el Paz y Salvo.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo de creación generada por el servidor."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo de actualización generada por el servidor."
+        }
+      },
+      "required": [
+        "registrationNumber",
+        "name",
+        "description",
+        "downloadUrl",
+        "isPublished",
+        "createdBy",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Documento de control de acceso para administradores autorizados.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 160
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin"]
+        }
+      },
+      "required": ["email", "role"]
+    },
+    "AuditLog": {
+      "title": "AuditLog",
+      "description": "Registro inmutable de auditoría administrativa con fecha, acción realizada, dirección IP, ubicación aproximada, usuario y metadatos de contexto.",
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "Tipo de acción administrativa ejecutada.",
+          "minLength": 2,
+          "maxLength": 40,
+          "enum": [
+            "CREAR",
+            "EDITAR",
+            "CAMBIAR_ESTADO",
+            "ELIMINAR",
+            "CARGA_MASIVA",
+            "EXPORTAR",
+            "INICIO_SESION",
+            "CIERRE_SESION"
+          ]
+        },
+        "module": {
+          "type": "string",
+          "description": "Módulo del panel administrativo donde ocurrió el evento.",
+          "minLength": 2,
+          "maxLength": 40,
+          "enum": ["PAGOS", "PAZ_Y_SALVO", "PQRS", "FORM_EMPRESA", "AUDITORIA", "ACCESO"]
+        },
+        "targetKey": {
+          "type": "string",
+          "description": "Identificador o referencia afectada por la acción.",
+          "maxLength": 120
+        },
+        "actor": {
+          "type": "string",
+          "description": "Usuario o correo del administrador que ejecutó la acción.",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "actorUid": {
+          "type": "string",
+          "description": "UID de Firebase Auth del administrador que registró el evento.",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "summary": {
+          "type": "string",
+          "description": "Resumen legible de la acción realizada.",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "details": {
+          "type": "string",
+          "description": "Detalles adicionales de los valores modificados o del evento.",
+          "maxLength": 600
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "Dirección IP registrada desde la conexión administrativa.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "location": {
+          "type": "string",
+          "description": "Ubicación aproximada inferida por cabecera de red, zona horaria o GPS.",
+          "minLength": 1,
+          "maxLength": 180
+        },
+        "deviceInfo": {
+          "type": "string",
+          "description": "Navegador y sistema operativo detectados.",
+          "maxLength": 160
+        },
+        "timezone": {
+          "type": "string",
+          "description": "Zona horaria reportada por el navegador.",
+          "maxLength": 64
+        },
+        "locale": {
+          "type": "string",
+          "description": "Idioma configurado en el navegador.",
+          "maxLength": 20
+        },
+        "screenInfo": {
+          "type": "string",
+          "description": "Resolución de pantalla reportada.",
+          "maxLength": 30
+        },
+        "requestMethod": {
+          "type": "string",
+          "description": "Método y ruta técnica del evento administrativo.",
+          "maxLength": 120
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo del servidor al registrar el evento de auditoría."
+        }
+      },
+      "required": [
+        "action",
+        "module",
+        "targetKey",
+        "actor",
+        "actorUid",
+        "summary",
+        "details",
+        "ipAddress",
+        "location",
+        "deviceInfo",
+        "timezone",
+        "locale",
+        "screenInfo",
+        "requestMethod",
+        "createdAt"
+      ]
+    },
+    "PqrsSubmission": {
+      "title": "PqrsSubmission",
+      "description": "Solicitud PQRS radicada por un ciudadano con seguimiento de vencimiento a 15 días y estado de atención.",
+      "type": "object",
+      "properties": {
+        "radicado": {
+          "type": "string",
+          "description": "Código de radicado único de la PQRS.",
+          "minLength": 4,
+          "maxLength": 40
+        },
+        "pqrsType": {
+          "type": "string",
+          "description": "Tipo de solicitud (Petición, Queja, Reclamo, Sugerencia, Felicitación).",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "area": {
+          "type": "string",
+          "description": "Área institucional relacionada.",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Nombre completo del solicitante.",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "documentNumber": {
+          "type": "string",
+          "description": "Número de documento del solicitante (opcional).",
+          "maxLength": 40
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Correo electrónico de contacto.",
+          "minLength": 3,
+          "maxLength": 160
+        },
+        "phone": {
+          "type": "string",
+          "description": "Teléfono o WhatsApp de contacto.",
+          "minLength": 5,
+          "maxLength": 40
+        },
+        "subject": {
+          "type": "string",
+          "description": "Asunto breve de la solicitud.",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "message": {
+          "type": "string",
+          "description": "Descripción detallada de la PQRS.",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "status": {
+          "type": "string",
+          "description": "Estado de gestión de la PQRS.",
+          "enum": ["PENDIENTE", "HECHO"]
+        },
+        "completedBy": {
+          "type": "string",
+          "description": "Correo o identificador del administrador que marcó la solicitud como hecha.",
+          "maxLength": 160
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha y hora exacta de radicación generada por el servidor."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha y hora de última actualización generada por el servidor."
+        }
+      },
+      "required": [
+        "radicado",
+        "pqrsType",
+        "area",
+        "fullName",
+        "documentNumber",
+        "email",
+        "phone",
+        "subject",
+        "message",
+        "status",
+        "completedBy",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "EmpresaSubmission": {
+      "title": "EmpresaSubmission",
+      "description": "Formulario de vinculación o encuesta empresarial enviado desde la sección de Empresas.",
+      "type": "object",
+      "properties": {
+        "companyName": {
+          "type": "string",
+          "description": "Razón social o nombre de la empresa.",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "nit": {
+          "type": "string",
+          "description": "NIT de la empresa (opcional).",
+          "maxLength": 40
+        },
+        "contactName": {
+          "type": "string",
+          "description": "Nombre de la persona de contacto.",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "role": {
+          "type": "string",
+          "description": "Cargo o área del contacto.",
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Correo electrónico corporativo.",
+          "minLength": 3,
+          "maxLength": 160
+        },
+        "phone": {
+          "type": "string",
+          "description": "Teléfono o WhatsApp de la empresa.",
+          "minLength": 5,
+          "maxLength": 40
+        },
+        "requestType": {
+          "type": "string",
+          "description": "Tipo de alianza, convenio o proyecto seleccionado.",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "details": {
+          "type": "string",
+          "description": "Descripción de la propuesta o necesidad empresarial.",
+          "maxLength": 2000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha y hora exacta en que la empresa diligenció el formulario."
+        }
+      },
+      "required": [
+        "companyName",
+        "nit",
+        "contactName",
+        "role",
+        "email",
+        "phone",
+        "requestType",
+        "details",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/payment_queries/{cedula}": {
+      "schema": { "$ref": "#/entities/PaymentQuery" },
+      "description": "Registros de consulta de pago indexados por número de cédula exacto."
+    },
+    "/paz_y_salvos/{recordId}": {
+      "schema": { "$ref": "#/entities/PazYSalvo" },
+      "description": "Listado de Paz y Salvo disponibles con descripción desplegable y link de descarga."
+    },
+    "/admins/{uid}": {
+      "schema": { "$ref": "#/entities/AdminUser" },
+      "description": "Registro de administradores autorizados (solo lectura propia, sin escritura cliente)."
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/AuditLog" },
+      "description": "Historial inmutable (solo inserción) de eventos de auditoría administrativa."
+    },
+    "/pqrs_submissions/{recordId}": {
+      "schema": { "$ref": "#/entities/PqrsSubmission" },
+      "description": "Solicitudes PQRS radicadas por ciudadanos (creación pública validada, lectura y gestión solo para administradores)."
+    },
+    "/empresa_submissions/{recordId}": {
+      "schema": { "$ref": "#/entities/EmpresaSubmission" },
+      "description": "Encuestas y formularios de vinculación enviados por empresas (creación pública validada, lectura solo para administradores)."
+    }
+  }
+}

@@ -1,0 +1,408 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net (Default-Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Shared Hardened Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isPrimaryAdmin() {
+      return isVerifiedUser() && request.auth.token.email == 'grupoulep@gmail.com';
+    }
+
+    function isAdmin() {
+      return isPrimaryAdmin() || (
+        isVerifiedUser() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidCedula(cedula) {
+      return cedula is string && cedula.size() >= 5 && cedula.size() <= 15 && cedula.matches('^[0-9]{5,15}$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation Blueprint: PaymentQuery
+    function isValidPaymentQuery(data, cedulaId) {
+      return data.keys().hasAll([
+          'cedula',
+          'reference',
+          'amount',
+          'concept',
+          'isPaid',
+          'hasDueDate',
+          'dueDate',
+          'updatedBy',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'cedula',
+          'reference',
+          'amount',
+          'concept',
+          'isPaid',
+          'hasDueDate',
+          'dueDate',
+          'updatedBy',
+          'createdAt',
+          'updatedAt'
+        ])
+        && isValidCedula(data.cedula)
+        && data.cedula == cedulaId
+        && data.reference is string && data.reference.size() >= 1 && data.reference.size() <= 60
+        && data.amount is string && data.amount.size() <= 40
+        && data.concept is string && data.concept.size() <= 160
+        && data.isPaid is bool
+        && data.hasDueDate is bool
+        && data.dueDate is string && data.dueDate.size() <= 20
+        && (
+          (data.hasDueDate == false && data.dueDate == '') ||
+          (data.hasDueDate == true && data.dueDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))
+        )
+        && data.updatedBy is string && data.updatedBy.size() >= 1 && data.updatedBy.size() <= 128
+        && data.updatedBy == request.auth.uid
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // Validation Blueprint: PazYSalvo
+    function isValidPazYSalvo(data) {
+      return data.keys().hasAll([
+          'registrationNumber',
+          'name',
+          'description',
+          'downloadUrl',
+          'isPublished',
+          'createdBy',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'registrationNumber',
+          'name',
+          'description',
+          'downloadUrl',
+          'isPublished',
+          'createdBy',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.registrationNumber is string && data.registrationNumber.size() >= 1 && data.registrationNumber.size() <= 60
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 140
+        && data.description is string && data.description.size() <= 500
+        && data.downloadUrl is string && data.downloadUrl.size() >= 8 && data.downloadUrl.size() <= 500
+        && data.downloadUrl.matches('^https://.+')
+        && data.isPublished is bool
+        && data.createdBy is string && data.createdBy.size() >= 1 && data.createdBy.size() <= 128
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // Validation Blueprint: AuditLog (append-only administrative trail)
+    function isValidAuditLog(data) {
+      return data.keys().hasAll([
+          'action',
+          'module',
+          'targetKey',
+          'actor',
+          'actorUid',
+          'summary',
+          'details',
+          'ipAddress',
+          'location',
+          'deviceInfo',
+          'timezone',
+          'locale',
+          'screenInfo',
+          'requestMethod',
+          'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'action',
+          'module',
+          'targetKey',
+          'actor',
+          'actorUid',
+          'summary',
+          'details',
+          'ipAddress',
+          'location',
+          'deviceInfo',
+          'timezone',
+          'locale',
+          'screenInfo',
+          'requestMethod',
+          'createdAt'
+        ])
+        && data.action is string && data.action.size() >= 2 && data.action.size() <= 40
+        && data.action in [
+          'CREAR',
+          'EDITAR',
+          'CAMBIAR_ESTADO',
+          'ELIMINAR',
+          'CARGA_MASIVA',
+          'EXPORTAR',
+          'INICIO_SESION',
+          'CIERRE_SESION'
+        ]
+        && data.module is string && data.module.size() >= 2 && data.module.size() <= 40
+        && data.module in ['PAGOS', 'PAZ_Y_SALVO', 'PQRS', 'FORM_EMPRESA', 'AUDITORIA', 'ACCESO']
+        && data.targetKey is string && data.targetKey.size() <= 120
+        && data.actor is string && data.actor.size() >= 1 && data.actor.size() <= 160
+        && data.actorUid is string && data.actorUid.size() >= 1 && data.actorUid.size() <= 128
+        && data.actorUid == request.auth.uid
+        && data.summary is string && data.summary.size() >= 1 && data.summary.size() <= 240
+        && data.details is string && data.details.size() <= 600
+        && data.ipAddress is string && data.ipAddress.size() >= 1 && data.ipAddress.size() <= 80
+        && data.location is string && data.location.size() >= 1 && data.location.size() <= 180
+        && data.deviceInfo is string && data.deviceInfo.size() <= 160
+        && data.timezone is string && data.timezone.size() <= 64
+        && data.locale is string && data.locale.size() <= 20
+        && data.screenInfo is string && data.screenInfo.size() <= 30
+        && data.requestMethod is string && data.requestMethod.size() <= 120
+        && data.createdAt is timestamp;
+    }
+
+    // Validation Blueprint: PqrsSubmission
+    function isValidPqrsSubmission(data) {
+      return data.keys().hasAll([
+          'radicado',
+          'pqrsType',
+          'area',
+          'fullName',
+          'documentNumber',
+          'email',
+          'phone',
+          'subject',
+          'message',
+          'status',
+          'completedBy',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'radicado',
+          'pqrsType',
+          'area',
+          'fullName',
+          'documentNumber',
+          'email',
+          'phone',
+          'subject',
+          'message',
+          'status',
+          'completedBy',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.radicado is string && data.radicado.size() >= 4 && data.radicado.size() <= 40
+        && data.pqrsType is string && data.pqrsType.size() >= 1 && data.pqrsType.size() <= 80
+        && data.area is string && data.area.size() >= 1 && data.area.size() <= 100
+        && data.fullName is string && data.fullName.size() >= 1 && data.fullName.size() <= 140
+        && data.documentNumber is string && data.documentNumber.size() <= 40
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && data.phone is string && data.phone.size() >= 5 && data.phone.size() <= 40
+        && data.subject is string && data.subject.size() >= 1 && data.subject.size() <= 200
+        && data.message is string && data.message.size() >= 1 && data.message.size() <= 2000
+        && data.status is string && data.status.size() >= 4 && data.status.size() <= 20
+        && data.status in ['PENDIENTE', 'HECHO']
+        && data.completedBy is string && data.completedBy.size() <= 160
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // Validation Blueprint: EmpresaSubmission
+    function isValidEmpresaSubmission(data) {
+      return data.keys().hasAll([
+          'companyName',
+          'nit',
+          'contactName',
+          'role',
+          'email',
+          'phone',
+          'requestType',
+          'details',
+          'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'companyName',
+          'nit',
+          'contactName',
+          'role',
+          'email',
+          'phone',
+          'requestType',
+          'details',
+          'createdAt'
+        ])
+        && data.companyName is string && data.companyName.size() >= 1 && data.companyName.size() <= 160
+        && data.nit is string && data.nit.size() <= 40
+        && data.contactName is string && data.contactName.size() >= 1 && data.contactName.size() <= 140
+        && data.role is string && data.role.size() <= 120
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && data.phone is string && data.phone.size() >= 5 && data.phone.size() <= 40
+        && data.requestType is string && data.requestType.size() >= 1 && data.requestType.size() <= 140
+        && data.details is string && data.details.size() <= 2000
+        && data.createdAt is timestamp;
+    }
+
+    // Admins RBAC table (read own entry only, no client writes)
+    match /admins/{uid} {
+      allow get: if isValidId(uid) && isSignedIn() && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+
+    // Payment consultation records indexed by exact cedula
+    match /payment_queries/{cedula} {
+      // Exact-cedula lookup only (prevents enumerating other citizens' cedulas)
+      allow get: if isValidCedula(cedula);
+      // Admin listing without document lookup overhead
+      allow list: if isPrimaryAdmin();
+
+      allow create: if isSignedIn()
+        && isValidCedula(cedula)
+        && isValidPaymentQuery(incoming(), cedula)
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && isAdmin();
+
+      allow update: if isSignedIn()
+        && isValidCedula(cedula)
+        && isValidPaymentQuery(incoming(), cedula)
+        && incoming().cedula == existing().cedula
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'reference',
+          'amount',
+          'concept',
+          'isPaid',
+          'hasDueDate',
+          'dueDate',
+          'updatedBy',
+          'updatedAt'
+        ])
+        && isAdmin();
+
+      allow delete: if isSignedIn()
+        && isValidCedula(cedula)
+        && isAdmin();
+    }
+
+    // Paz y Salvo public download catalog managed by verified admins
+    match /paz_y_salvos/{recordId} {
+      allow get: if isValidId(recordId) && (existing().isPublished == true || isAdmin());
+      allow list: if existing().isPublished == true || isPrimaryAdmin();
+
+      allow create: if isSignedIn()
+        && isValidId(recordId)
+        && isValidPazYSalvo(incoming())
+        && incoming().createdBy == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && isAdmin();
+
+      allow update: if isSignedIn()
+        && isValidId(recordId)
+        && isValidPazYSalvo(incoming())
+        && incoming().createdBy == existing().createdBy
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'registrationNumber',
+          'name',
+          'description',
+          'downloadUrl',
+          'isPublished',
+          'updatedAt'
+        ])
+        && isAdmin();
+
+      allow delete: if isSignedIn()
+        && isValidId(recordId)
+        && isAdmin();
+    }
+
+    // Immutable append-only audit logs for verified administrators
+    match /audit_logs/{logId} {
+      allow get: if isValidId(logId) && isAdmin();
+      allow list: if isPrimaryAdmin();
+
+      allow create: if isSignedIn()
+        && isValidId(logId)
+        && isValidAuditLog(incoming())
+        && incoming().createdAt == request.time
+        && isAdmin();
+
+      allow update, delete: if false;
+    }
+
+    // Citizen PQRS submissions (validated public intake, admin-only PII access & status updates)
+    match /pqrs_submissions/{recordId} {
+      allow get: if isValidId(recordId) && isAdmin();
+      allow list: if isPrimaryAdmin();
+
+      allow create: if isValidId(recordId)
+        && isValidPqrsSubmission(incoming())
+        && incoming().status == 'PENDIENTE'
+        && incoming().completedBy == ''
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isSignedIn()
+        && isValidId(recordId)
+        && isValidPqrsSubmission(incoming())
+        && incoming().radicado == existing().radicado
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'status',
+          'completedBy',
+          'updatedAt'
+        ])
+        && isAdmin();
+
+      allow delete: if isSignedIn()
+        && isValidId(recordId)
+        && isAdmin();
+    }
+
+    // Company alliance/survey form submissions (validated public intake, admin-only PII access)
+    match /empresa_submissions/{recordId} {
+      allow get: if isValidId(recordId) && isAdmin();
+      allow list: if isPrimaryAdmin();
+
+      allow create: if isValidId(recordId)
+        && isValidEmpresaSubmission(incoming())
+        && incoming().createdAt == request.time;
+
+      allow update: if false;
+
+      allow delete: if isSignedIn()
+        && isValidId(recordId)
+        && isAdmin();
+    }
+  }
+}

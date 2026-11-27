@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 import SiteLayout from '../components/SiteLayout';
 import { withBase } from '../security/paths';
-import { isValidEmail, isValidPhone, sanitizeFormAction } from '../security/security';
+import { isValidEmail, isValidPhone } from '../security/security';
+import { createEmpresaSubmissionInFirestore } from '../security/firestoreForms';
 import { getEmpresaData, getMediaData, getOrgData } from '../security/vault';
 
 const benefitIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -56,6 +57,7 @@ export default function EmpresaPage() {
   const [details, setDetails] = useState('');
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [formError, setFormError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [submittedRecord, setSubmittedRecord] = useState<{
     companyName: string;
     requestType: string;
@@ -71,46 +73,57 @@ export default function EmpresaPage() {
       ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (submitting) return;
+
     if (!companyName.trim() || !contactName.trim() || !email.trim() || !phone.trim()) {
-      e.preventDefault();
       setFormError('Por favor complete los campos obligatorios marcados con asterisco (*).');
       return;
     }
     if (!isValidEmail(email)) {
-      e.preventDefault();
       setFormError('Por favor ingrese un correo electrónico corporativo válido.');
       return;
     }
     if (!isValidPhone(phone)) {
-      e.preventDefault();
       setFormError('Por favor ingrese un número de teléfono válido.');
       return;
     }
     if (!acceptedPolicy) {
-      e.preventDefault();
       setFormError(
         'Debe aceptar la Política de Privacidad y Tratamiento de Datos Personales para continuar.'
       );
       return;
     }
-    if (sanitizeFormAction(org.formAction) === '#') {
-      e.preventDefault();
-      setFormError('El canal de envío no se encuentra disponible temporalmente.');
-      return;
-    }
 
     setFormError('');
-    const savedCompany = companyName.trim();
-    const savedType = requestType;
-    const savedEmail = email.trim();
-    window.setTimeout(() => {
+    setSubmitting(true);
+    try {
+      const savedCompany = companyName.trim();
+      const savedType = requestType;
+      const savedEmail = email.trim();
+      await createEmpresaSubmissionInFirestore({
+        companyName: savedCompany,
+        nit: nit.trim(),
+        contactName: contactName.trim(),
+        role: role.trim(),
+        email: savedEmail,
+        phone: phone.trim(),
+        requestType: savedType,
+        details: details.trim(),
+      });
       setSubmittedRecord({
         companyName: savedCompany,
         requestType: savedType,
-        email: savedEmail
+        email: savedEmail,
       });
-    }, 300);
+    } catch {
+      setFormError(
+        'No fue posible enviar la solicitud empresarial en este momento. Intenta nuevamente.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleResetForm = () => {
@@ -377,28 +390,7 @@ export default function EmpresaPage() {
                   </div>
                 </div>
               ) : (
-                <form
-                  action={sanitizeFormAction(org.formAction)}
-                  method="POST"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onSubmit={handleSubmit}
-                  className="space-y-5"
-                  noValidate
-                >
-                  <input
-                    type="hidden"
-                    name="_subject"
-                    value={`Nueva solicitud empresarial (${requestType}) - Fundación ULEP`}
-                  />
-                  <input type="hidden" name="_template" value="table" />
-                  <input
-                    type="text"
-                    name="_honey"
-                    className="hidden"
-                    tabIndex={-1}
-                    autoComplete="off"
-                  />
+                <form onSubmit={handleSubmit} className="space-y-5" noValidate>
 
                   <div className="pb-4 border-b border-gray-200">
                     <h3 className="text-xl sm:text-2xl font-bold text-blue-950 tracking-tight">
@@ -597,9 +589,10 @@ export default function EmpresaPage() {
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-blue-950 hover:bg-blue-800 text-white text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap"
+                      disabled={submitting}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-blue-950 hover:bg-blue-800 disabled:opacity-60 text-white text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap"
                     >
-                      Enviar solicitud empresarial
+                      {submitting ? 'Enviando solicitud...' : 'Enviar solicitud empresarial'}
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>

@@ -21,11 +21,12 @@ export default defineConfig(({ command }) => {
         transformIndexHtml(html: string) {
           const csp = [
             "default-src 'self'",
-            "script-src 'self'",
+            "script-src 'self' https://apis.google.com",
             "style-src 'self' 'unsafe-inline'",
             "img-src 'self' https: data:",
             "font-src 'self' https: data:",
-            "connect-src 'self' https://formsubmit.co",
+            "connect-src 'self' https://formsubmit.co https://*.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com",
+            "frame-src 'self' https://fluted-graph-72ts5.firebaseapp.com https://accounts.google.com",
             "form-action 'self' https://formsubmit.co",
             "base-uri 'self'",
             "object-src 'none'",

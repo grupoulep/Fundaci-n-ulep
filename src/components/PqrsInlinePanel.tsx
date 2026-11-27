@@ -10,7 +10,8 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { withBase } from '../security/paths';
-import { isValidEmail, isValidPhone, sanitizeFormAction } from '../security/security';
+import { isValidEmail, isValidPhone } from '../security/security';
+import { createPqrsSubmissionInFirestore } from '../security/firestoreForms';
 import { getOrgData, getPqrsData } from '../security/vault';
 
 export default function PqrsInlinePanel() {
@@ -29,6 +30,7 @@ export default function PqrsInlinePanel() {
   const [message, setMessage] = useState('');
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [formError, setFormError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [submittedRecord, setSubmittedRecord] = useState<{
     radicado: string;
     pqrsType: string;
@@ -36,7 +38,10 @@ export default function PqrsInlinePanel() {
     email: string;
   } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (submitting) return;
+
     if (
       !fullName.trim() ||
       !email.trim() ||
@@ -44,7 +49,6 @@ export default function PqrsInlinePanel() {
       !subject.trim() ||
       !message.trim()
     ) {
-      e.preventDefault();
       setFormError(
         'Por favor complete todos los campos obligatorios marcados con asterisco (*).'
       );
@@ -52,47 +56,51 @@ export default function PqrsInlinePanel() {
     }
 
     if (!isValidEmail(email)) {
-      e.preventDefault();
       setFormError('Por favor ingrese un correo electrónico válido.');
       return;
     }
 
     if (!isValidPhone(phone)) {
-      e.preventDefault();
       setFormError('Por favor ingrese un número de teléfono válido.');
       return;
     }
 
     if (!acceptedPolicy) {
-      e.preventDefault();
       setFormError(
         'Debe aceptar la Política de Privacidad y Tratamiento de Datos Personales para radicar su solicitud.'
       );
       return;
     }
 
-    if (sanitizeFormAction(org.formAction) === '#') {
-      e.preventDefault();
-      setFormError('El canal de envío no se encuentra disponible temporalmente.');
-      return;
-    }
-
     setFormError('');
-    const radicado = `PQRS-${new Date().getFullYear()}-${String(
-      Math.floor(1000 + Math.random() * 9000)
-    )}`;
-    const savedName = fullName.trim();
-    const savedEmail = email.trim();
-    const savedType = pqrsType;
-
-    window.setTimeout(() => {
+    setSubmitting(true);
+    try {
+      const savedName = fullName.trim();
+      const savedEmail = email.trim();
+      const savedType = pqrsType;
+      const result = await createPqrsSubmissionInFirestore({
+        pqrsType: savedType,
+        area,
+        fullName: savedName,
+        documentNumber: documentNumber.trim(),
+        email: savedEmail,
+        phone: phone.trim(),
+        subject: subject.trim(),
+        message: message.trim(),
+      });
       setSubmittedRecord({
-        radicado,
+        radicado: result.radicado,
         pqrsType: savedType,
         fullName: savedName,
         email: savedEmail,
       });
-    }, 300);
+    } catch {
+      setFormError(
+        'No fue posible radicar tu solicitud en este momento. Intenta nuevamente en unos segundos.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleResetForm = () => {
@@ -149,28 +157,7 @@ export default function PqrsInlinePanel() {
             </div>
           </div>
         ) : (
-          <form
-            action={sanitizeFormAction(org.formAction)}
-            method="POST"
-            target="_blank"
-            rel="noopener noreferrer"
-            onSubmit={handleSubmit}
-            className="space-y-4"
-            noValidate
-          >
-            <input
-              type="hidden"
-              name="_subject"
-              value={`Nueva PQRS (${pqrsType}): ${subject || 'Solicitud ciudadana'} - Fundación ULEP`}
-            />
-            <input type="hidden" name="_template" value="table" />
-            <input
-              type="text"
-              name="_honey"
-              className="hidden"
-              tabIndex={-1}
-              autoComplete="off"
-            />
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
 
             <div className="pb-4 border-b border-gray-200 flex items-start gap-3">
               <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-800 flex items-center justify-center shrink-0 mt-0.5">
@@ -380,9 +367,10 @@ export default function PqrsInlinePanel() {
             <div className="pt-1">
               <button
                 type="submit"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-blue-950 hover:bg-blue-800 text-white text-sm font-semibold transition-colors cursor-pointer"
+                disabled={submitting}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-blue-950 hover:bg-blue-800 disabled:opacity-60 text-white text-sm font-semibold transition-colors cursor-pointer"
               >
-                Radicar solicitud
+                {submitting ? 'Radicando solicitud...' : 'Radicar solicitud'}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

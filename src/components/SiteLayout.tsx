@@ -45,24 +45,7 @@ const menuItems: MenuItem[] = [
   {
     title: 'EMPRESA',
     href: '/empresa.html',
-    subitems: [
-      {
-        label: 'Alianzas Estratégicas',
-        href: '/empresa.html?tipo=Alianza%20Estrat%C3%A9gica%20Interinstitucional'
-      },
-      {
-        label: 'Prácticas Profesionales',
-        href: '/empresa.html?tipo=Convenio%20de%20Pr%C3%A1cticas%20Profesionales'
-      },
-      {
-        label: 'Bolsa de Empleo',
-        href: '/empresa.html?tipo=Publicaci%C3%B3n%20de%20Vacante%20(Bolsa%20de%20Empleo)'
-      },
-      {
-        label: 'Convenios',
-        href: '/empresa.html?tipo=Convenio%20Marco%20de%20Cooperaci%C3%B3n'
-      }
-    ]
+    subitems: []
   },
   {
     title: 'TRÁMITES',
@@ -117,8 +100,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
       <header className="w-full bg-white shadow-md sticky top-0 z-50 border-t border-gray-100">
         <div className="w-full max-w-[1000px] mx-auto px-4">
           {/* Mobile menu bar */}
-          <div className="w-full flex md:hidden items-center justify-between py-2.5">
-            <span className="text-sm font-bold text-blue-900 tracking-wide">MENÚ DE OPCIONES</span>
+          <div className="w-full flex md:hidden items-center justify-end py-2.5">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-blue-900 hover:bg-blue-50 focus:outline-none"

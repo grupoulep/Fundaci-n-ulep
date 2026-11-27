@@ -19,7 +19,14 @@ import {
   Upload,
   Download,
 } from 'lucide-react';
-import { onAuthStateChanged, signInWithPopup, signOut, type User } from 'firebase/auth';
+import {
+  getRedirectResult,
+  onAuthStateChanged,
+  signInWithPopup,
+  signInWithRedirect,
+  signOut,
+  type User,
+} from 'firebase/auth';
 import {
   auth,
   googleProvider,
@@ -257,6 +264,52 @@ function getModuleLabel(moduleName: string): string {
   }
 }
 
+function getFirebaseErrorCode(error: unknown): string {
+  if (error && typeof error === 'object' && 'code' in error && typeof error.code === 'string') {
+    return error.code;
+  }
+  return '';
+}
+
+function formatGoogleAuthError(error: unknown): string {
+  const code = getFirebaseErrorCode(error);
+  const currentHost =
+    typeof window !== 'undefined' && window.location?.hostname
+      ? window.location.hostname
+      : 'este dominio';
+
+  switch (code) {
+    case 'auth/unauthorized-domain':
+      return `El dominio "${currentHost}" aún no está autorizado en Firebase Authentication. Agrégalo en Firebase Console → Authentication → Settings → Dominios autorizados.`;
+    case 'auth/popup-closed-by-user':
+    case 'auth/cancelled-popup-request':
+      return 'Se cerró la ventana de Google antes de completar el acceso.';
+    case 'auth/popup-blocked':
+      return 'El navegador bloqueó la ventana emergente de Google. Permite ventanas emergentes e intenta nuevamente.';
+    case 'auth/network-request-failed':
+      return 'No hubo respuesta de Google. Verifica tu conexión a internet e intenta nuevamente.';
+    default:
+      return code
+        ? `No se pudo completar el inicio de sesión con Google (${code}).`
+        : 'No se pudo completar el inicio de sesión con Google.';
+  }
+}
+
+async function fetchJsonIfAvailable<T>(
+  url: string,
+  init?: RequestInit
+): Promise<T | null> {
+  try {
+    const res = await fetch(url, init);
+    if (!res.ok) return null;
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.toLowerCase().includes('application/json')) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
 export default function AdminPortalOverlay({
   isOpen,
   onClose,
@@ -402,26 +455,62 @@ export default function AdminPortalOverlay({
       });
   }, [isOpen, geoCoords, requestExactLocation]);
 
-  // Track Firebase Auth readiness for Firestore rules enforcement
+  // Track Firebase Auth readiness, handle redirect returns, and auto-restore verified admin session
   useEffect(() => {
+    let active = true;
+
+    void getRedirectResult(auth)
+      .then(async (result) => {
+        if (!active || !result?.user) return;
+        if (!isFirebaseAdminUser(result.user)) {
+          await signOut(auth);
+          setAuthError(
+            `Debes iniciar sesión con la cuenta administradora autorizada (${PRIMARY_ADMIN_EMAIL}).`
+          );
+          return;
+        }
+        const idToken = await result.user.getIdToken();
+        if (active) {
+          setAuthToken(idToken);
+          setAuthError('');
+        }
+      })
+      .catch((err) => {
+        if (active) {
+          setAuthError(formatGoogleAuthError(err));
+        }
+      });
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setFirebaseUser(user);
       setFirebaseAuthReady(true);
+      if (isFirebaseAdminUser(user) && user) {
+        void user
+          .getIdToken()
+          .then((idToken) => {
+            if (active) {
+              setAuthToken((prev) => prev || idToken);
+            }
+          })
+          .catch(() => {
+            // Keep manual login option available if token refresh fails
+          });
+      }
     });
-    return () => unsubscribe();
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, []);
 
   const fetchServerAuditContext = useCallback(
     async (token: string): Promise<Partial<AuditNetworkContext>> => {
-      try {
-        const res = await fetch('/api/admin/audit-context', {
-          headers: buildAuditHeaders(token),
-        });
-        if (!res.ok) return {};
-        return (await res.json()) as Partial<AuditNetworkContext>;
-      } catch {
-        return {};
-      }
+      const data = await fetchJsonIfAvailable<Partial<AuditNetworkContext>>(
+        '/api/admin/audit-context',
+        { headers: buildAuditHeaders(token) }
+      );
+      return data ?? {};
     },
     [buildAuditHeaders]
   );
@@ -473,26 +562,19 @@ export default function AdminPortalOverlay({
     }
   }, []);
 
-  // Check server admin configuration status when overlay opens
+  // Check optional backend admin status when overlay opens (non-blocking on static domains)
   useEffect(() => {
     if (!isOpen) return;
     let active = true;
     const checkStatus = async () => {
-      try {
-        const res = await fetch('/api/admin/status', {
-          headers: buildAuditHeaders(authToken),
-        });
-        if (!res.ok) return;
-        const data = (await res.json()) as { configured: boolean; authenticated: boolean };
-        if (!active) return;
-        setAuthConfigured(data.configured);
-        if (authToken && !data.authenticated) {
-          setAuthToken(null);
-        }
-      } catch {
-        if (active) {
-          setAuthError('No se pudo conectar con el servidor de autenticación.');
-        }
+      const data = await fetchJsonIfAvailable<{ configured: boolean; authenticated: boolean }>(
+        '/api/admin/status',
+        { headers: buildAuditHeaders(authToken) }
+      );
+      if (!active || !data) return;
+      setAuthConfigured(data.configured);
+      if (authToken && !data.authenticated && !isFirebaseAdminUser(auth.currentUser)) {
+        setAuthToken(null);
       }
     };
     void checkStatus();
@@ -651,34 +733,49 @@ export default function AdminPortalOverlay({
     setGoogleLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const idToken = await result.user.getIdToken();
-      const res = await fetch('/api/auth/me?auditLogin=1', {
-        headers: buildAuditHeaders(idToken),
-      });
-      const data = (await res.json()) as {
-        isAdmin?: boolean;
-        error?: string;
-        auditContext?: Partial<AuditNetworkContext>;
-      };
-      if (!res.ok || !data.isAdmin) {
+      if (!isFirebaseAdminUser(result.user)) {
         await signOut(auth);
         setAuthError(
           `Debes iniciar sesión con la cuenta administradora autorizada (${PRIMARY_ADMIN_EMAIL}).`
         );
         return;
       }
+
+      const idToken = await result.user.getIdToken();
       setAuthToken(idToken);
+
+      // Optional backend enrichment (works seamlessly even on static hosts like fundacionulep.fun)
+      const serverData = await fetchJsonIfAvailable<{
+        isAdmin?: boolean;
+        auditContext?: Partial<AuditNetworkContext>;
+      }>('/api/auth/me?auditLogin=1', {
+        headers: buildAuditHeaders(idToken),
+      });
+
       void recordFirestoreAuditEvent(idToken, {
         action: 'INICIO_SESION',
         module: 'ACCESO',
         targetKey: result.user.email || 'Panel administrativo',
         summary: 'Inició sesión en el panel administrativo con Google autorizado',
-        details: 'Autenticación verificada con Firebase Auth',
-        requestMethod: 'GET /api/auth/me',
-        context: data.auditContext,
+        details: `Autenticación verificada con Firebase Auth (${window.location.hostname})`,
+        requestMethod: 'FIREBASE_GOOGLE_AUTH',
+        context: serverData?.auditContext,
       });
-    } catch {
-      setAuthError('No se pudo completar el inicio de sesión con Google.');
+    } catch (err) {
+      const code = getFirebaseErrorCode(err);
+      if (
+        code === 'auth/popup-blocked' ||
+        code === 'auth/operation-not-supported-in-this-environment'
+      ) {
+        try {
+          await signInWithRedirect(auth, googleProvider);
+          return;
+        } catch (redirectErr) {
+          setAuthError(formatGoogleAuthError(redirectErr));
+          return;
+        }
+      }
+      setAuthError(formatGoogleAuthError(err));
     } finally {
       setGoogleLoading(false);
     }
@@ -689,32 +786,46 @@ export default function AdminPortalOverlay({
     setConnectingFirestoreGoogle(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const idToken = await result.user.getIdToken();
-      const res = await fetch('/api/auth/me?auditLogin=1', {
-        headers: buildAuditHeaders(idToken),
-      });
-      const data = (await res.json()) as {
-        isAdmin?: boolean;
-        auditContext?: Partial<AuditNetworkContext>;
-      };
-      if (!res.ok || !data.isAdmin) {
+      if (!isFirebaseAdminUser(result.user)) {
         await signOut(auth);
         setAuditError(
           `Debes conectar la cuenta administradora autorizada (${PRIMARY_ADMIN_EMAIL}).`
         );
         return;
       }
+
+      const idToken = await result.user.getIdToken();
+      const serverData = await fetchJsonIfAvailable<{
+        isAdmin?: boolean;
+        auditContext?: Partial<AuditNetworkContext>;
+      }>('/api/auth/me?auditLogin=1', {
+        headers: buildAuditHeaders(idToken),
+      });
+
       void recordFirestoreAuditEvent(idToken, {
         action: 'INICIO_SESION',
         module: 'ACCESO',
         targetKey: result.user.email || 'Auditoría Firestore',
-        summary: 'Conectó cuenta Google autorizada para consultar auditoría en Firestore',
-        details: 'Acceso verificado con Firebase Auth',
-        requestMethod: 'GET /api/auth/me',
-        context: data.auditContext,
+        summary: 'Conectó cuenta Google autorizada para consultar Firestore',
+        details: `Acceso verificado con Firebase Auth (${window.location.hostname})`,
+        requestMethod: 'FIREBASE_GOOGLE_AUTH',
+        context: serverData?.auditContext,
       });
-    } catch {
-      setAuditError('No se pudo conectar la cuenta de Google en este momento.');
+    } catch (err) {
+      const code = getFirebaseErrorCode(err);
+      if (
+        code === 'auth/popup-blocked' ||
+        code === 'auth/operation-not-supported-in-this-environment'
+      ) {
+        try {
+          await signInWithRedirect(auth, googleProvider);
+          return;
+        } catch (redirectErr) {
+          setAuditError(formatGoogleAuthError(redirectErr));
+          return;
+        }
+      }
+      setAuditError(formatGoogleAuthError(err));
     } finally {
       setConnectingFirestoreGoogle(false);
     }

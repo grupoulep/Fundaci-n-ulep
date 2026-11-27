@@ -89,9 +89,9 @@ export default function HomePage() {
     <SiteLayout>
       <main className="w-full flex-1 bg-white">
         {/* Panel 1: Main Banner Carousel */}
-        <section className="w-full bg-white pt-6 pb-10 sm:pt-8 sm:pb-12">
-          <div className="max-w-6xl mx-auto px-6 sm:px-8">
-            <div className="relative w-full aspect-[2/1] rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm group">
+        <section className="w-full bg-white">
+          <div className="w-full">
+            <div className="relative w-full aspect-[2/1] overflow-hidden bg-white group">
               {carouselImages.map((slide, index) => (
                 <div
                   key={slide.url}

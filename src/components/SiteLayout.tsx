@@ -35,18 +35,12 @@ const menuItems: MenuItem[] = [
   {
     title: 'INICIO',
     href: '/',
-    subitems: [
-      { label: 'Bienvenida', href: '/#bienvenida', targetId: 'bienvenida' },
-      { label: 'Noticias', href: '/#noticias', targetId: 'noticias' }
-    ]
+    subitems: []
   },
   {
     title: 'ESTUDIANTES',
-    href: '/campus.html',
-    subitems: [
-      { label: 'Campus', href: '/campus.html' },
-      { label: 'Cursos', href: '/cursos.html' }
-    ]
+    href: '/estudiantes.html',
+    subitems: []
   },
   {
     title: 'EMPRESA',
@@ -73,29 +67,7 @@ const menuItems: MenuItem[] = [
   {
     title: 'TRÁMITES',
     href: '/tramites.html',
-    subitems: [
-      { label: 'Pagos en Línea', href: '/tramites.html#zona-pagos', targetId: 'zona-pagos' },
-      {
-        label: 'PQRS',
-        href: '/pqrs.html'
-      },
-      {
-        label: 'Preguntas Frecuentes',
-        href: '/preguntas-frecuentes.html'
-      },
-      { label: 'Donaciones', href: '/tramites.html#donaciones', targetId: 'donaciones' },
-      { label: 'Paz y Salvo', href: '/tramites.html#paz-y-salvo', targetId: 'paz-y-salvo' },
-      {
-        label: 'Consulta tus Pagos',
-        href: '/tramites.html#consulta-pagos',
-        targetId: 'consulta-pagos'
-      },
-      {
-        label: 'Certificados',
-        href: '/tramites.html#certificados',
-        targetId: 'certificados'
-      }
-    ]
+    subitems: []
   },
   {
     title: 'TRANSPARENCIA',
@@ -130,8 +102,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Logo Section (scrolls away) */}
       <div className="w-full bg-white">
-        <div className="w-full max-w-[1000px] mx-auto grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-4 px-4">
-          <div aria-hidden="true" />
+        <div className="w-full max-w-[1000px] mx-auto flex items-center justify-center py-4 px-4">
           <a href={withBase('/')} aria-label="Ir al inicio de Fundación ULEP">
             <img
               src={withBase(media.logoPrimary)}
@@ -139,14 +110,6 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
               className="h-14 md:h-16 lg:h-20 object-contain mx-auto"
             />
           </a>
-          <div className="flex justify-end">
-            <a
-              href={withBase('/admin.html')}
-              className="inline-flex items-center justify-center px-4 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            >
-              Login
-            </a>
-          </div>
         </div>
       </div>
 
@@ -321,8 +284,7 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
               <ul className="space-y-3 text-sm">
                 {[
                   { label: 'Inicio', href: '/' },
-                  { label: 'Campus Virtual', href: '/campus.html' },
-                  { label: 'Cursos', href: '/cursos.html' },
+                  { label: 'Estudiantes', href: '/estudiantes.html' },
                   { label: 'Empresa', href: '/empresa.html' },
                   { label: 'Trámites', href: '/tramites.html' },
                   { label: 'Transparencia', href: '/transparencia.html' }
@@ -346,11 +308,11 @@ export default function SiteLayout({ children }: SiteLayoutProps) {
               </h3>
               <ul className="space-y-3 text-sm">
                 {[
-                  { label: 'Zona de Pagos', href: '/tramites.html#zona-pagos' },
+                  { label: 'Consulta tus Pagos', href: '/tramites.html#consulta-pagos' },
+                  { label: 'Paz y Salvo', href: '/tramites.html#paz-y-salvo' },
                   { label: 'Donaciones', href: '/tramites.html#donaciones' },
-                  { label: 'Diligencia tu PQRS', href: '/pqrs.html' },
-                  { label: 'Certificados y Constancias', href: '/tramites.html#certificados' },
-                  { label: 'Preguntas Frecuentes', href: '/preguntas-frecuentes.html' }
+                  { label: 'Diligencia tu PQRS', href: '/tramites.html#pqrs' },
+                  { label: 'Preguntas Frecuentes', href: '/tramites.html#preguntas-frecuentes' }
                 ].map((service) => (
                   <li key={service.label}>
                     <a

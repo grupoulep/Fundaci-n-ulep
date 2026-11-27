@@ -21,12 +21,11 @@ export default defineConfig(({ command }) => {
         transformIndexHtml(html: string) {
           const csp = [
             "default-src 'self'",
-            "script-src 'self' https://apis.google.com https://www.gstatic.com",
+            "script-src 'self'",
             "style-src 'self' 'unsafe-inline'",
             "img-src 'self' https: data:",
             "font-src 'self' https: data:",
-            "connect-src 'self' https://formsubmit.co https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com",
-            "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com",
+            "connect-src 'self' https://formsubmit.co",
             "form-action 'self' https://formsubmit.co",
             "base-uri 'self'",
             "object-src 'none'",
@@ -61,8 +60,6 @@ export default defineConfig(({ command }) => {
           preguntasFrecuentes: path.resolve(__dirname, 'preguntas-frecuentes.html'),
           transparencia: path.resolve(__dirname, 'transparencia.html'),
           donaciones: path.resolve(__dirname, 'donaciones.html'),
-          zonaPagos: path.resolve(__dirname, 'zona-pagos.html'),
-          admin: path.resolve(__dirname, 'admin.html'),
         },
       },
     },

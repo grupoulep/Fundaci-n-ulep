@@ -146,7 +146,7 @@ export default function TermsOfUsePage() {
                 >
                   {org.emailContact}
                 </a>{' '}
-                o a los teléfonos <span className="tabular-nums">{org.phonesSlash}</span>.
+                o al teléfono <span className="tabular-nums">{org.phonesSlash}</span>.
               </p>
             </section>
           </div>

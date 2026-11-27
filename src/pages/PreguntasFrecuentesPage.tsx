@@ -116,7 +116,7 @@ function buildFaqCategories(): FaqCategory[] {
               y en nuestros canales oficiales. Para participar, solo debes diligenciar el formulario
               de inscripción correspondiente en la sección de{' '}
               <a
-                href={withBase('/cursos.html')}
+                href={withBase('/estudiantes.html#cursos')}
                 className="text-blue-700 font-medium hover:underline underline-offset-2"
               >
                 Cursos
@@ -356,9 +356,8 @@ function buildFaqCategories(): FaqCategory[] {
   ];
 }
 
-export default function PreguntasFrecuentesPage() {
+export function FaqAccordionContent() {
   const faqCategories = buildFaqCategories();
-  const media = getMediaData();
   const [openFaqIds, setOpenFaqIds] = useState<string[]>([]);
 
   const toggleFaq = (id: string) => {
@@ -366,6 +365,65 @@ export default function PreguntasFrecuentesPage() {
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
+
+  return (
+    <div className="space-y-10">
+      {faqCategories.map((category) => (
+        <div key={category.title}>
+          <h2 className="text-lg sm:text-xl font-extrabold text-blue-950 tracking-tight pb-3 border-b-2 border-blue-950 mb-4">
+            {category.title}
+          </h2>
+
+          <div className="divide-y divide-gray-200 border-b border-gray-200 bg-white/90">
+            {category.items.map((item) => {
+              const isOpen = openFaqIds.includes(item.id);
+              const panelId = `${item.id}-panel`;
+
+              return (
+                <div key={item.id}>
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    onClick={() => toggleFaq(item.id)}
+                    className="w-full py-4 sm:py-5 px-2 sm:px-3 flex items-center justify-between gap-4 text-left hover:bg-gray-50 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg"
+                  >
+                    <span className="flex items-baseline gap-3">
+                      <span className="text-xs font-bold text-blue-700 tabular-nums shrink-0">
+                        {item.number}.
+                      </span>
+                      <span className="text-sm sm:text-base font-bold text-blue-950 leading-snug">
+                        {item.question}
+                      </span>
+                    </span>
+                    <ChevronDown
+                      aria-hidden="true"
+                      className={`w-5 h-5 text-blue-800 shrink-0 transition-transform duration-200 ${
+                        isOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div
+                      id={panelId}
+                      className="px-2 sm:px-3 pb-5 pl-9 sm:pl-11 text-sm sm:text-[15px] text-gray-600 leading-relaxed"
+                    >
+                      {item.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function PreguntasFrecuentesPage() {
+  const media = getMediaData();
 
   return (
     <SiteLayout>
@@ -410,58 +468,7 @@ export default function PreguntasFrecuentesPage() {
           />
 
           <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-8">
-            <div className="space-y-10">
-              {faqCategories.map((category) => (
-                <div key={category.title}>
-                  <h2 className="text-lg sm:text-xl font-extrabold text-blue-950 tracking-tight pb-3 border-b-2 border-blue-950 mb-4">
-                    {category.title}
-                  </h2>
-
-                  <div className="divide-y divide-gray-200 border-b border-gray-200 bg-white/90">
-                    {category.items.map((item) => {
-                      const isOpen = openFaqIds.includes(item.id);
-                      const panelId = `${item.id}-panel`;
-
-                      return (
-                        <div key={item.id}>
-                          <button
-                            type="button"
-                            aria-expanded={isOpen}
-                            aria-controls={panelId}
-                            onClick={() => toggleFaq(item.id)}
-                            className="w-full py-4 sm:py-5 px-2 sm:px-3 flex items-center justify-between gap-4 text-left hover:bg-gray-50 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg"
-                          >
-                            <span className="flex items-baseline gap-3">
-                              <span className="text-xs font-bold text-blue-700 tabular-nums shrink-0">
-                                {item.number}.
-                              </span>
-                              <span className="text-sm sm:text-base font-bold text-blue-950 leading-snug">
-                                {item.question}
-                              </span>
-                            </span>
-                            <ChevronDown
-                              aria-hidden="true"
-                              className={`w-5 h-5 text-blue-800 shrink-0 transition-transform duration-200 ${
-                                isOpen ? 'rotate-180' : ''
-                              }`}
-                            />
-                          </button>
-
-                          {isOpen && (
-                            <div
-                              id={panelId}
-                              className="px-2 sm:px-3 pb-5 pl-9 sm:pl-11 text-sm sm:text-[15px] text-gray-600 leading-relaxed"
-                            >
-                              {item.answer}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <FaqAccordionContent />
           </div>
         </section>
       </main>

@@ -46,7 +46,7 @@ export default function PrivacyPolicyPage() {
                   {org.legalRep}
                 </li>
                 <li>
-                  <strong className="font-semibold text-gray-900">Teléfonos:</strong>{' '}
+                  <strong className="font-semibold text-gray-900">Teléfono:</strong>{' '}
                   <span className="tabular-nums">{org.phonesDash}</span>
                 </li>
                 <li>

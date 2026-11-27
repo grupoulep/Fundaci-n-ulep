@@ -527,7 +527,7 @@ export default function EmpresaPage() {
                         required
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        placeholder="Ej. 300 000 0000"
+                        placeholder={org.phonePlaceholder}
                         className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-gray-300 text-sm text-gray-900 tabular-nums focus:outline-none focus:border-blue-700 focus:ring-2 focus:ring-blue-100"
                       />
                     </div>
